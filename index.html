@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
     <title>CMSC124 Project</title>
 </head>
 <body>
-    <h1>Hello po</h1>
-    
+    <div ng-controller="lexicalController as lex">
+        <h1>Hello po</h1>
+        <input type="file" ng-model="lex.file" ng-change="lex.loadFile()">
+        <button ng-click="lex.loadFile()">Load</button>
+        <pre>
+            <p>{{lex.text}}</p>
+        </pre>
+    </div>
 
-    <script type="text/javascript" src="bundle.js"></script>
+    <script type="text/javascript" src="angular.js"></script>
+    <script type="text/javascript" src="app/app.js"></script>
+    <script type="text/javascript" src="app/ng-file-input.js"></script>
+    <script type="text/javascript" src="app/lexical.js"></script>
 </body>
 </html>
