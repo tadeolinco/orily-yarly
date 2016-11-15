@@ -45,20 +45,19 @@
                 
 
                 // [STRING] check
-                if (input === "'" || input === '"') {
-                    var delimiter = input;
-                    pushToken(input, 'string delimiter')
-                    input = '';
-                    while(chars[++i] !== delimiter) {
-                        input += chars[i];
+                if (input === "'" || input === '"') {           // initial string delimiter
+                    var delimiter = input;                      // saves which one was used
+                    pushToken(input, 'string delimiter')        // pushes to vm.token
+                    input = '';                                 // clear input string
+                    while(chars[++i] !== delimiter) {           // get all chars until another delimiter
+                        input += chars[i];                      
                         console.log(input);
-                    }
-                    pushToken(input, 'string');
-                    if (chars[i] === delimiter)
-                        pushToken(chars[i], 'string delimiter');
-                    continue;
-                }    
-                //
+                    }   
+                    pushToken(input, 'string literal');         // push string literal
+                    pushToken(chars[i], 'string delimiter');    // push ending delimiter
+                    input = '';                                 // clear again
+                    continue;                                   // get next lexeme
+                }
                      
             }
             console.log(vm.tokens);
