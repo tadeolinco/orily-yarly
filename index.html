@@ -5,14 +5,19 @@
 </head>
 <body>
     <div ng-controller="lexicalController as lex">
-        <h1>Hello po</h1>
-        <input type="file" ng-model="lex.file" ng-change="lex.loadFile()">
-        <button ng-click="lex.loadFile()">Load</button>
+        <button ng-click="lex.openFile();">Load File</button>
+        <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
         <pre>
             <p>{{lex.text}}</p>
         </pre>
-    </div>
 
+        <ul>
+            <li ng-repeat="token in lex.tokens">
+                {{token.input}} - {{token.type}}
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="angular.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <script type="text/javascript" src="app/ng-file-input.js"></script>
