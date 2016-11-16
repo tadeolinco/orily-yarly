@@ -27,7 +27,8 @@
             CODE_DELIMITER                  : /((HAI)(?:\s+))|((?:\s+)(KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
             VISIBLE                         : /(VISIBLE)\s+/,            
-            
+            PARAMETER_DELIMETER             : /(AN)\s+/,
+
             // CONTROL FLOW
             CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
             CONDITIONAL_DELIMETER           : /\s(O RLY\?)\s+/,
@@ -36,11 +37,26 @@
             SWITCH_DELIMETER                : /(WTF\?)\s+/,
 
             // DATA TYPE
-            BOOLEAN                         : /(WIN|FAIL)/,
+            BOOLEAN                         : /\s(WIN|FAIL)\s+/,
             DATA_TYPE                       : /\s(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s/,
 
             // FUNCTION
-            FUNCTION_DELIMETER              : /(HOW IZ I|IF U SAY SO)\s+/,
+            FUNCTION_CALL                   : /\s(I IZ)\s+/,
+            FUNCTION_DELIMETER              : /\s(HOW IZ I|IF U SAY SO)\s+/,
+            FUNCTION_ARGUMENT_SEPARATOR     : /\s(AN YR)\s+/,
+
+            // LOOPS
+            LOOP_DELIMETER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
+            LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
+
+            // OPERATORS
+            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
+            BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF)\s+/,
+            COMPARISON_OPERATORS            : /\s(BOTH SAEM|DIFFRINT)\s+/,
+            CONCATENATION                   : /\s(SMOOSH)\s+/,
+            CASTING_IMPLICIT                : /\s(MAEK)\s+/,
+            CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
+            UNARY_OPERATORS                 : /\s(NERFIN|UPPIN)\s+/,
 
             // RETURN
             RETURN_W_VALUE                  : /(FOUND YR)\s+/,
