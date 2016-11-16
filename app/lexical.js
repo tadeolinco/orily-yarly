@@ -26,9 +26,9 @@
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
             CODE_DELIMITER                  : /((HAI)\s+)|(\s+(KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
-            INPUT                           : /\s(VISIBLE)\s+/,
-            OUTPUT                          : /\s(GIMMEH)\s+/,
-            PARAMETER_DELIMETER             : /\s(AN)\s+/,
+            OUTPUT                          : /\s(VISIBLE)\s+/,
+            INPUT                           : /\s(GIMMEH)\s+/,
+            PARAMETER_DELIMITER             : /\s(AN)\s+/,
 
             // CONTROL FLOW
             CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
@@ -44,29 +44,28 @@
 
             // FUNCTION
             FUNCTION_CALL                   : /\s(I IZ)\s+/,
-            FUNCTION_DELIMETER_START        : /\s(HOW IZ I)\s+/,
-            FUNCTION_DELIMETER_END          : /\s(IF U SAY SO)\s+/,
+            FUNCTION_DELIMITER_START        : /\s(HOW IZ I)\s+/,
+
+            FUNCTION_DELIMITER_END          : /\s(IF U SAY SO)\s+/,
             FUNCTION_ARGUMENT_SEPARATOR     : /\s(YR)\s+/,
+            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
+            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
 
             // LOOPS
-            LOOP_DELIMETER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
+            LOOP_DELIMITER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
             LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
 
             // OPERATORS
-            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
             BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
             CONCATENATION                   : /\s(SMOOSH)\s+/,
             CASTING_IMPLICIT                : /\s(MAEK)\s+/,
             CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
+            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
             UNARY_OPERATORS                 : /\s(NERFIN|UPPIN)\s+/,
 
-            // RETURN
-            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
-            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
-
             // VARIABLE DECLARATION
+            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/,
             DECLARATION_DELIMITER           : /\s(I HAS A)\s+/,
-            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/
         });
 
 
@@ -126,6 +125,22 @@
                         }
                     }
                     input = '';
+                }
+
+                // [ BOOLEAN ]
+                if (exec = (Re.BOOLEAN.exec(input))) {
+                    pushToken(exec[1], 'boolean');
+                    input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ DATA TYPE ]
+                if (exec = (Re.DATA_TYPE.exec(input))) {
+                    pushToken(exec[1], 'data type');
+                    input = '';
+                    i--;
+                    continue;
                 }
 
                 // [ CODE DELIMITER ]
@@ -251,7 +266,7 @@
                     continue;
                 }
 
-                // [ CONDITIONAL DELIMITER]
+                // [ CONDITIONAL DELIMITER ]
 
                 if (exec = (Re.CONDITIONAL_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'conditional delimiter');
@@ -272,6 +287,7 @@
                 if (exec = (Re.CONCATENATION.exec(input))) {
                     pushToken(exec[1], 'concatenation');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -279,11 +295,21 @@
                 if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
                     pushToken(exec[1], 'explicit casting');
                     input = '';
+                    i--;
                     continue;
                 }
                 if (exec = (Re.CASTING_IMPLICIT.exec(input))) {
                     pushToken(exec[1], 'implicit casting');
                     input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ UNARY OPERATORS ]
+                if (exec = (Re.UNARY_OPERATORS.exec(input))) {
+                    pushToken(exec[1], 'unary operators');
+                    input = '';
+                    i--;
                     continue;
                 }
 
@@ -304,7 +330,7 @@
                 }
 
                 // [ PARAMETER DELIMITER ]
-                if (exec = (Re.PARAMETER_DELIMETER.exec(input))) {
+                if (exec = (Re.PARAMETER_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'parameter delimiter');
                     input = '';
                     i--;
@@ -312,7 +338,7 @@
                 }
 
                 // [ FUNCTION DECLARATION ]
-                if (exec = (Re.FUNCTION_DELIMETER_START.exec(input))) {
+                if (exec = (Re.FUNCTION_DELIMITER_START.exec(input))) {
                     pushToken(exec[1], 'function declaration');
                     input = '';
                     while (!Re.WHITESPACE.test(chars[++i])) {
@@ -330,7 +356,7 @@
                 }
 
                 // [ FUNCTION DECLARATION END ]
-                if (exec = (Re.FUNCTION_DELIMETER_END.exec(input))) {
+                if (exec = (Re.FUNCTION_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'function declaration end');
                     input = '';
                     i--;
@@ -365,10 +391,11 @@
                     continue;
                 }
 
-                // [ LOOP DELIMETER]
-                if (exec = (Re.LOOP_DELIMETER.exec(input))) {
-                    pushToken(exec[1], 'loop delimeter');
+                // [ LOOP DELIMITER]
+                if (exec = (Re.LOOP_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'loop delimiter');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -376,6 +403,7 @@
                 if (exec = (Re.LOOP_EVALUATION.exec(input))) {
                     pushToken(exec[1], 'loop evaluation');
                     input = '';
+                    i--;
                     continue;
                 }
             }
