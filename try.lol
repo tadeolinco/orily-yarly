@@ -1,7 +1,11 @@
 HAI
     I HAS A pen
-    I HAS A pineaapple
+    OBTW this is a declaration
+    of variable TLDR 
+    I HAS A pineapple
     GIMMEH pen
-    GIMMEH pineaapple
+    GIMMEH pineapple
     VISIBLE SMOOSH pen AN pineapple
+    pen R SUM OF 5 AN pineapple
+    pen IS NOW A NUMBR
 KTHXBYE

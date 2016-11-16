@@ -45,23 +45,23 @@
             // FUNCTION
             FUNCTION_CALL                   : /\s(I IZ)\s+/,
             FUNCTION_DELIMITER_START        : /\s(HOW IZ I)\s+/,
-
             FUNCTION_DELIMITER_END          : /\s(IF U SAY SO)\s+/,
             FUNCTION_ARGUMENT_SEPARATOR     : /\s(YR)\s+/,
             RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
             RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
 
             // LOOPS
-            LOOP_DELIMITER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
+            LOOP_DELIMITER_START            : /\s(IM IN YR)\s+/,
+            LOOP_DELIMITER_END              : /\s(IM OUTTA YR)\s+/,
             LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
 
-            // OPERATORS
-            BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
+            // OPERATOR
+            BOOLEAN_OPERATOR                : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
             CONCATENATION                   : /\s(SMOOSH)\s+/,
             CASTING_IMPLICIT                : /\s(MAEK)\s+/,
             CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
-            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
-            UNARY_OPERATORS                 : /\s(NERFIN|UPPIN)\s+/,
+            MATH_OPERATOR                   : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
+            UNARY_OPERATOR                  : /\s(NERFIN|UPPIN)\s+/,
 
             // VARIABLE DECLARATION
             ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/,
@@ -78,8 +78,6 @@
             var exec = null;
             for (let i=0; i < chars.length; i++) {
                 input += chars[i];
-                console.log('input: '+input);
-                console.log("start: "+chars[i]);
 
                 // [ STRING ]
                 if (Re.STRING_DELIMITER.exec(chars[i])) {        // initial string delimiter
@@ -87,14 +85,12 @@
                     pushToken(chars[i], 'string delimiter')     // pushes to vm.token
                     while(chars[++i] !== '"' && i < chars.length) {  // get all chars until another delimiter
                         input += chars[i];
-                        console.log(chars[i]);
                     }   
                     if (i == chars.length) {
                         return { error: 'string no delimiter' }
                     }
                     pushToken(input, 'string literal');         // push string literal
                     pushToken(chars[i], 'string delimiter');    // push ending delimiter
-                    console.log(chars[i]);
                     input = '';                                 // clear input string
                     continue;                                   // get next lexeme
                 }
@@ -104,7 +100,6 @@
                     input = '';
                     do {
                         input += chars[i];
-                        console.log(chars[i]);
                     } while(/[\d\.]/.exec(chars[++i]) && i < chars.length)
 
                     if (Re.WHITESPACE.exec(chars[i])) {
@@ -161,7 +156,6 @@
                     input = '';
                     while(!(exec = Re.BLOCK_COMMENT_DELIMITER_END.exec(input)) && i < chars.length) {
                         input += chars[++i]
-                        console.log(chars[i]);
                     }
                     if (!exec) {
                         return { error: 'block comment no delimiter' };
@@ -179,7 +173,6 @@
                     input = '';
                     while(!/\n/.exec(chars[++i]) && i < chars.length) {
                         input += chars[i];
-                        console.log(chars[i]);
                     }                        
                     pushToken(input, 'line comment');
                     input = '';
@@ -215,9 +208,10 @@
 
                 // [ KNOWN VARIABLE IDENTIFIERS ]
                 if (exec = (Re.VARIABLE_IDENTIFIER).exec(input)) {
+                    console.log('['+exec[1]+']');
                     for (symbol of vm.symbols) {
                         if (symbol.identifier == exec[1]) {
-                            pushToken(input, 'variable identifier');
+                            pushToken(exec[1], 'variable identifier');
                             input = '';
                             i--;
                             continue;
@@ -242,7 +236,7 @@
                 }
 
                 // [ MATH OPERATOR ]
-                if (exec = (Re.MATH_OPERATORS.exec(input))) {
+                if (exec = (Re.MATH_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'math operator');
                     input = '';
                     i--;
@@ -251,7 +245,7 @@
 
 
                 // [ BOOLEAN OPERATOR ]
-                if (exec = (Re.BOOLEAN_OPERATORS.exec(input))) {
+                if (exec = (Re.BOOLEAN_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'boolean operator');
                     input = '';
                     i--;
@@ -305,9 +299,9 @@
                     continue;
                 }
 
-                // [ UNARY OPERATORS ]
-                if (exec = (Re.UNARY_OPERATORS.exec(input))) {
-                    pushToken(exec[1], 'unary operators');
+                // [ UNARY OPERATOR ]
+                if (exec = (Re.UNARY_OPERATOR.exec(input))) {
+                    pushToken(exec[1], 'unary operator');
                     input = '';
                     i--;
                     continue;
@@ -332,6 +326,55 @@
                 // [ PARAMETER DELIMITER ]
                 if (exec = (Re.PARAMETER_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'parameter delimiter');
+                    input = '';
+                    i--;
+                    continue;
+                }
+
+
+                // [ LOOP DELIMITER START ]
+                if (exec = (Re.LOOP_DELIMITER_START.exec(input))) {
+                    pushToken(exec[1], 'loop delimiter start');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    }
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'loop label');
+                        input = '';
+                    } else {
+                        return { error: 'invalid loop label name: '+ input }
+                    }
+                    i--;
+                    continue;
+                }
+
+                // [ LOOP DELIMITER END ]
+                if (exec = (Re.LOOP_DELIMITER_END.exec(input))) {
+                    pushToken(exec[1], 'loop delimiter end');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    }
+                    var found = false;
+                    for (token of vm.tokens) {
+                        if (token.lexeme === input && token.classification === 'loop label') {
+                            pushToken(input, 'loop label');
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        i--;
+                        continue;
+                    } else {
+                        return { error: 'no such loop label' };
+                    }
+                }
+
+                // [ LOOP EVALUATION ]
+                if (exec = (Re.LOOP_EVALUATION.exec(input))) {
+                    pushToken(exec[1], 'loop evaluation');
                     input = '';
                     i--;
                     continue;
@@ -386,22 +429,6 @@
                 // [ FUNCTION ARGUMENT SEPARATOR ]  
                 if (exec = (Re.FUNCTION_ARGUMENT_SEPARATOR.exec(input))) {
                     pushToken(exec[1], 'function argument delimiter');
-                    input = '';
-                    i--;
-                    continue;
-                }
-
-                // [ LOOP DELIMITER]
-                if (exec = (Re.LOOP_DELIMITER.exec(input))) {
-                    pushToken(exec[1], 'loop delimiter');
-                    input = '';
-                    i--;
-                    continue;
-                }
-
-                // [ LOOP EVALUATION ]
-                if (exec = (Re.LOOP_EVALUATION.exec(input))) {
-                    pushToken(exec[1], 'loop evaluation');
                     input = '';
                     i--;
                     continue;
