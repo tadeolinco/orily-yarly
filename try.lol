@@ -1,5 +1,4 @@
 HAI
-    I HAS A pen ITZ 2.3
-    OBTW
-    TLDR
+I HAS A pen ITZ 2.3
+GIMMEH pen
 KTHXBYE

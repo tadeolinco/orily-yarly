@@ -35,8 +35,8 @@
             CONDITIONAL_DELIMITER           : /\s(O RLY\?)\s+/,
             COMPARISON_BLOCK                : /\s(OMG|OMGWTF)\s+/,
 
-            CONTROL_FLOW_DELIMITER_END      : /(OIC)\s+/,
-            SWITCH_DELIMITER                : /(WTF\?)\s+/,
+            CONTROL_FLOW_DELIMITER_END      : /\s(OIC)\s+/,
+            SWITCH_DELIMITER                : /\s(WTF\?)\s+/,
 
             // DATA TYPE
             BOOLEAN                         : /\s(WIN|FAIL)\s+/,
@@ -44,7 +44,8 @@
 
             // FUNCTION
             FUNCTION_CALL                   : /\s(I IZ)\s+/,
-            FUNCTION_DELIMETER              : /\s(HOW IZ I|IF U SAY SO)\s+/,
+            FUNCTION_DELIMETER_START        : /\s(HOW IZ I)\s+/,
+            FUNCTION_DELIMETER_START        : /\s(IF U SAY SO)\s+/,
             FUNCTION_ARGUMENT_SEPARATOR     : /\s(AN YR)\s+/,
 
             // LOOPS
@@ -96,6 +97,7 @@
                     pushToken(chars[i], 'string delimiter');    // push ending delimiter
                     console.log(chars[i]);
                     input = '';                                 // clear input string
+                    i--;
                     continue;                                   // get next lexeme
                 }
 
@@ -112,7 +114,7 @@
                         if (Re.INTEGER.exec(input)) {
                             pushToken(input, 'integer literal');
                             input = ''
-    
+                            i--;
                             continue;
                         }
 
@@ -120,7 +122,7 @@
                         if (Re.FLOAT.exec(input)) {
                             pushToken(input, 'floating-point literal');
                             input = '';
-    
+                            i--;
                             continue;
                         }
                     }
@@ -134,8 +136,8 @@
                         pushToken(exec[2], 'code delimiter');
                     if (exec[4])
                         pushToken(exec[4], 'code delimiter');
-
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -154,6 +156,7 @@
                     pushToken(exec[1], 'block comment');
                     pushToken(exec[2], 'block comment delimiter');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -167,6 +170,7 @@
                     }                        
                     pushToken(input, 'line comment');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -177,8 +181,6 @@
                     while (!Re.WHITESPACE.test(chars[++i])) {
                         input += chars[i];
                     } 
-                    console.log('variable: '+input)
-                    console.log('length: '+input.length)
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'variable identifier');
                         pushSymbol(input);
@@ -186,6 +188,7 @@
                     } else {
                         return { error: 'invalid variable indentifier name: '+ input }
                     }
+                    i--;
                     continue;
                 }
 
@@ -193,6 +196,7 @@
                 if (exec = (Re.ASSIGNMENT_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'assignment operator');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -202,6 +206,7 @@
                         if (symbol.identifier == exec[1]) {
                             pushToken(input, 'variable identifier');
                             input = '';
+                            i--;
                             continue;
                         }
                     }
@@ -211,6 +216,7 @@
                 if (exec = (Re.OUTPUT.exec(input))) {
                     pushToken(exec[1], 'output keyword');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -218,6 +224,7 @@
                 if (exec = (Re.INPUT.exec(input))) {
                     pushToken(exec[1], 'input keyword');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -225,6 +232,7 @@
                 if (exec = (Re.MATH_OPERATORS.exec(input))) {
                     pushToken(exec[1], 'math operator');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -233,6 +241,7 @@
                 if (exec = (Re.BOOLEAN_OPERATORS.exec(input))) {
                     pushToken(exec[1], 'boolean operator');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -240,6 +249,7 @@
                 if (exec = (Re.CONDITIONAL_BLOCK.exec(input))) {
                     pushToken(exec[1], 'conditional block');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -248,6 +258,7 @@
                 if (exec = (Re.CONDITIONAL_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'conditional delimiter');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -255,6 +266,7 @@
                 if (exec = (Re.COMPARISON_BLOCK.exec(input))) {
                     pushToken(exec[1], 'comparison block');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -281,6 +293,7 @@
                 if (exec = (Re.CONTROL_FLOW_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'control flow delimiter end');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -288,13 +301,33 @@
                 if (exec = (Re.SWITCH_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'switch delimiter');
                     input = '';
+                    i--;
                     continue;
                 }
 
-                // [ ARGUMENT SEPARATOR ]
+                // [ PARAMETER DELIMITER ]
                 if (exec = (Re.PARAMETER_DELIMETER.exec(input))) {
-                    pushToken(exec[1], 'argument separator');
+                    pushToken(exec[1], 'parameter delimiter');
                     input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ FUNCTION DECLARATION ]
+                if (exec = (Re.FUNCTION_DELIMETER_START.exec(input))) {
+                    pushToken(exec[1], 'function declaration');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    } 
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'function identifier');
+                        pushSymbol(input);
+                        input = '';
+                    } else {
+                        return { error: 'invalid function indentifier name: '+ input }
+                    }
+                    i--;
                     continue;
                 }
 
