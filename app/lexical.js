@@ -45,8 +45,8 @@
             // FUNCTION
             FUNCTION_CALL                   : /\s(I IZ)\s+/,
             FUNCTION_DELIMETER_START        : /\s(HOW IZ I)\s+/,
-            FUNCTION_DELIMETER_START        : /\s(IF U SAY SO)\s+/,
-            FUNCTION_ARGUMENT_SEPARATOR     : /\s(AN YR)\s+/,
+            FUNCTION_DELIMETER_END          : /\s(IF U SAY SO)\s+/,
+            FUNCTION_ARGUMENT_SEPARATOR     : /\s(YR)\s+/,
 
             // LOOPS
             LOOP_DELIMETER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
@@ -97,7 +97,6 @@
                     pushToken(chars[i], 'string delimiter');    // push ending delimiter
                     console.log(chars[i]);
                     input = '';                                 // clear input string
-                    i--;
                     continue;                                   // get next lexeme
                 }
 
@@ -131,7 +130,6 @@
 
                 // [ CODE DELIMITER ]
                 if (exec = (Re.CODE_DELIMITER.exec(input))) {
-                    console.log(exec);
                     if (exec[2])
                         pushToken(exec[2], 'code delimiter');
                     if (exec[4])
@@ -186,7 +184,7 @@
                         pushSymbol(input);
                         input = '';
                     } else {
-                        return { error: 'invalid variable indentifier name: '+ input }
+                        return { error: 'invalid variable identifier name: '+ input }
                     }
                     i--;
                     continue;
@@ -325,8 +323,44 @@
                         pushSymbol(input);
                         input = '';
                     } else {
-                        return { error: 'invalid function indentifier name: '+ input }
+                        return { error: 'invalid function identifier name: '+ input }
                     }
+                    i--;
+                    continue;
+                }
+
+                // [ FUNCTION DECLARATION END ]
+                if (exec = (Re.FUNCTION_DELIMETER_END.exec(input))) {
+                    pushToken(exec[1], 'function declaration end');
+                    input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ FUNCTION CALL ]
+                if (exec = (Re.FUNCTION_CALL.exec(input))) {
+                    pushToken(exec[1], 'function call delimiter');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    }
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        for (symbol of vm.symbols) {
+                            if (symbol.identifier === exec[1]) {
+                                pushToken(exec[1], 'function identifier');
+                            }
+                        }
+                    } else {
+                        return { error: 'invalid function identifier name: '+ input }
+                    }
+                    i--;
+                    continue;
+                }         
+
+                // [ FUNCTION ARGUMENT SEPARATOR ]  
+                if (exec = (Re.FUNCTION_ARGUMENT_SEPARATOR.exec(input))) {
+                    pushToken(exec[1], 'function argument delimiter');
+                    input = '';
                     i--;
                     continue;
                 }

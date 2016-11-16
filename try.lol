@@ -1,4 +1,7 @@
 HAI
-I HAS A pen ITZ 2.3
-GIMMEH pen
+    HOW IZ I hello
+        I HAS A pen ITZ "PINEAPPLE" BTWhello
+    IF U SAY SO
+
+    I IZ hello
 KTHXBYE
