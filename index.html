@@ -6,23 +6,71 @@
     <script src="semantic/semantic.min.js"></script>
 </head>
 <body>
-    <div ng-controller="lexicalController as lex">
-        <button ng-click="lex.openFile();" class="ui button">Load File</button>
-        <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
-        <pre>
-            <p>{{lex.text}}</p>
-        </pre>
 
-        <ul>
-            <li ng-repeat="token in lex.tokens">
-                {{token.lexeme}} - {{token.classification}}
-            </li>
-        </ul>
+    <div ng-controller="lexicalController as lex" class="ui centered padded grid">
+        <div class = "ui centered row">
+            <div class = "five wide column" style="overflow-y:scroll;white-space:nowrap;height:50vh">
+                <div class="ui header"><center>Code</center></div>
+                <div class="description">
+                    <center>
+                    <button ng-click="lex.openFile();" class="ui button">Open File</button>
+                    </center>
+                    <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
+                    <pre>
+                        <p>{{lex.text}}</p>
+                    </pre>
+                </div>
+            </div>
+
+            <div class = "five wide column" style="overflow-y:scroll;white-space:nowrap;height:50vh">
+                <div class="ui header"><center>Lexemes</center></div>
+                <center>
+                <table class="ui celled table">
+                    <thead>
+                        <tr><th><center>Lexeme</center></th>
+                        <th><center>Classification</center></th>
+                    </tr></thead>
+                    <tbody>
+                        <tr ng-repeat="token in lex.tokens">
+                            <td> {{token.lexeme}}</td>
+                            <td> {{token.classification}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </center>
+            </div>
+
+            <div class = "five wide column">
+            <div class="ui header"><center>Symbol Table</center></div>
+                   <center>
+                    <table class="ui celled table">
+                        <thead>
+                            <tr><th><center>Identifier</center></th>
+                            <th><center>Value</center></th>
+                        </tr></thead>
+                        <tbody>
+                            <tr ng-repeat="symbol in lex.symbols">
+                                <td>{{symbol.identifier}}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </center>
+                </div>
+        </div>
+        <div class = "row">
+            <div class = "fifteen wide column">
+                <button class ="fluid ui button">Execute</button>
+            </div>
+        </div>
     </div>
+
+
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/angular.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <script type="text/javascript" src="app/ng-file-input.js"></script>
     <script type="text/javascript" src="app/lexical.js"></script>
+
 </body>
 </html>
