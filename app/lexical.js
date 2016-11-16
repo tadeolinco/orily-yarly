@@ -128,7 +128,6 @@
 
                 // [ CODE DELIMITER ]
                 if (exec = (Re.CODE_DELIMITER.exec(input))) {
-                    console.log(exec);
                     if (exec[2])
                         pushToken(exec[2], 'code delimiter');
                     if (exec[4])
@@ -175,8 +174,6 @@
                     while (!Re.WHITESPACE.test(chars[++i])) {
                         input += chars[i];
                     } 
-                    console.log('variable: '+input)
-                    console.log('length: '+input.length)
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'variable identifier');
                         pushSymbol(input);
