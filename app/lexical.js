@@ -5,9 +5,12 @@
 
     function lexicalController($scope) {
         var vm = this;
+        
         vm.file = null;
         vm.text = "";
         vm.tokens = [];
+        vm.symbols = [];
+
         vm.loadFile = loadFile;
         vm.openFile = openFile;
 
@@ -21,7 +24,10 @@
             LINE_COMMENT_DELIMITER          : /(BTW)$/,
             BLOCK_COMMENT_DELIMITER_START   : /(OBTW)$/,
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
-            CODE_DELIMITER                  : /(HAI|KTHXBYE)$/
+            CODE_DELIMITER                  : /((HAI)(?:\s+))|((?:\s+)(KTHXBYE))$/,
+            VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
+            DECLARATION_DELIMITER           : /(I HAS A)\s+/,
+            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/,
         });
 
 
@@ -34,7 +40,7 @@
             var exec = null;
             for (let i=0; i < chars.length; i++) {
                 input += chars[i];
-                console.log(input);
+                console.log('input: '+input);
                 console.log("start: "+chars[i]);
 
                 // [ STRING ]
@@ -68,6 +74,7 @@
                         if (Re.INTEGER.exec(input)) {
                             pushToken(input, 'integer literal');
                             input = ''
+    
                             continue;
                         }
 
@@ -75,6 +82,7 @@
                         if (Re.FLOAT.exec(input)) {
                             pushToken(input, 'floating-point literal');
                             input = '';
+    
                             continue;
                         }
                     }
@@ -82,8 +90,12 @@
                 }
 
                 // [ CODE DELIMITER ]
-                if (Re.CODE_DELIMITER.exec(input)) {
-                    pushToken(input, 'code delimiter');
+                if (exec = (Re.CODE_DELIMITER.exec(input))) {
+                    if (exec[2])
+                        pushToken(exec[2], 'code delimiter');
+                    if (exec[4])
+                        pushToken(exec[4], 'code delimiter');
+
                     input = '';
                     continue;
                 }
@@ -106,8 +118,8 @@
                     continue;
                 }
                 // [ LINE COMMENT ]
-                if (Re.LINE_COMMENT_DELIMITER.exec(input)) {
-                    pushToken(input, 'line comment delimiter');
+                if (exec = (Re.LINE_COMMENT_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'line comment delimiter');
                     input = '';
                     while(!/\n/.exec(chars[++i]) && i < chars.length) {
                         input += chars[i];
@@ -117,8 +129,49 @@
                     input = '';
                     continue;
                 }
+
+                // [ VARIABLE DECLARATION ]
+                if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'declaration delimiter');
+                    input = '';
+                    do {
+                        input += chars[++i];
+                    } while (Re.WHITESPACE.test(chars[i]))
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'variable identifier');
+                        pushSymbol(input);
+                        input = '';
+                    } else {
+                        return { error: 'invalid variable indentifier name: '+ input }
+                    }
+                    continue;
+                }
+
+                // [ VARIABLE ASSIGNMENT ]
+                if (exec = (Re.ASSIGNMENT_OPERATOR.exec(input))) {
+                    pushToken(exec[1], 'assignment operator');
+                    input = '';
+                    continue;
+                }
+
+                // [ KNOWN VARIABLE IDENTIFIERS ]
+                if (exec = (Re.VARIABLE_IDENTIFIER).exec(input)) {
+                    for (symbol of vm.symbols) {
+                        if (symbol.identifier == exec[1]) {
+                            pushToken(input, 'variable identifier');
+                            input = '';
+                            continue;
+                        }
+                    }
+                }
+
+
+
+
+
+
             }
-            if (vm.tokens[vm.tokens.length-1].type !== 'code delimiter' || vm.tokens[0] !== 'code delimiter') {
+            if (vm.tokens.length === 0 || vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0] !== 'code delimiter') {
                 return { error: 'error code delimiter' }
             } 
             return { success: 'Success in analyzing ' }
@@ -130,8 +183,16 @@
             reader.onload = function() {
                 vm.text = reader.result;
                 vm.tokens = [];
-                analyze();
+                var results = analyze();
+                if (results.error) {
+                    console.log('ERROR: '+results.error);
+                } else {
+                    console.log('SUCCESS');
+                }
+                console.log('\n\nTOKENS:')
                 console.log(vm.tokens);
+                console.log('SYMBOLS:')
+                console.log(vm.symbols);
                 $scope.$apply();
             }
             reader.readAsText(vm.file);
@@ -142,11 +203,18 @@
         }
 
 
-        function pushToken(input, type) {
-            console.log('Pushed token [' + input +' : ' + type+ ']');
+        function pushToken(input, classification) {
+            console.log('Pushed token [' + input +' : ' + classification+ ']');
             vm.tokens.push({
-                input: input,
-                type: type
+                lexeme: input,
+                classification: classification
+            });
+        }
+
+        function pushSymbol(input) {
+            console.log('Pushed symbol ['+input+']');
+            vm.symbols.push({
+                identifier: input,
             });
         }
 

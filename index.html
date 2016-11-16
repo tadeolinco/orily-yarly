@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html ng-app="app" ng-cloak>
 <head>
     <title>CMSC124 Project</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
 <body>
     <div ng-controller="lexicalController as lex">
@@ -13,12 +14,12 @@
 
         <ul>
             <li ng-repeat="token in lex.tokens">
-                {{token.input}} - {{token.type}}
+                {{token.lexeme}} - {{token.classification}}
             </li>
         </ul>
     </div>
-    <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="angular.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/angular.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <script type="text/javascript" src="app/ng-file-input.js"></script>
     <script type="text/javascript" src="app/lexical.js"></script>
