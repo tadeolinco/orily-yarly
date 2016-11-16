@@ -26,8 +26,29 @@
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
             CODE_DELIMITER                  : /((HAI)(?:\s+))|((?:\s+)(KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
+            VISIBLE                         : /(VISIBLE)\s+/,            
+            
+            // CONTROL FLOW
+            CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
+            CONDITIONAL_DELIMETER           : /\s(O RLY\?)\s+/,
+            COMPARISON_BLOCK                : /\s(OMG|OMGWTF)\s+/,
+            CONTROL_FLOW_DELIMETER_END      : /(OIC)\s+/,
+            SWITCH_DELIMETER                : /(WTF\?)\s+/,
+
+            // DATA TYPE
+            BOOLEAN                         : /(WIN|FAIL)/,
+            DATA_TYPE                       : /\s(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s/,
+
+            // FUNCTION
+            FUNCTION_DELIMETER              : /(HOW IZ I|IF U SAY SO)\s+/,
+
+            // RETURN
+            RETURN_W_VALUE                  : /(FOUND YR)\s+/,
+            RETURN_W_O_VALUE                : /(GTFO)\s+/,
+
+            // VARIABLE DECLARATION
             DECLARATION_DELIMITER           : /(I HAS A)\s+/,
-            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/,
+            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/
         });
 
 
@@ -165,7 +186,12 @@
                     }
                 }
 
-
+                // [ VISIBLE ]
+                if (exec = (Re.VISIBLE.exec(input))) {
+                    pushToken(exec[1], 'output keyword');
+                    input = '';
+                    continue;
+                }
 
 
 
