@@ -45,14 +45,14 @@
             // FUNCTION
             FUNCTION_CALL                   : /\s(I IZ)\s+/,
             FUNCTION_DELIMITER_START        : /\s(HOW IZ I)\s+/,
-
             FUNCTION_DELIMITER_END          : /\s(IF U SAY SO)\s+/,
             FUNCTION_ARGUMENT_SEPARATOR     : /\s(YR)\s+/,
             RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
             RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
 
             // LOOPS
-            LOOP_DELIMITER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
+            LOOP_DELIMITER_START            : /\s(IM IN YR)\s+/,
+            LOOP_DELIMITER_END              : /\s(IM OUTTA YR)\s+/,
             LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
 
             // OPERATORS
@@ -337,6 +337,55 @@
                     continue;
                 }
 
+
+                // [ LOOP DELIMITER START ]
+                if (exec = (Re.LOOP_DELIMITER_START.exec(input))) {
+                    pushToken(exec[1], 'loop delimiter start');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    }
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'loop label');
+                        input = '';
+                    } else {
+                        return { error: 'invalid loop label name: '+ input }
+                    }
+                    i--;
+                    continue;
+                }
+
+                // [ LOOP DELIMITER END ]
+                if (exec = (Re.LOOP_DELIMITER_END.exec(input))) {
+                    pushToken(exec[1], 'loop delimiter end');
+                    input = '';
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    }
+                    var found = false;
+                    for (token of vm.tokens) {
+                        if (token.lexeme === input && token.classification === 'loop label') {
+                            pushToken(input, 'loop label');
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        i--;
+                        continue;
+                    } else {
+                        return { error: 'no such loop label' };
+                    }
+                }
+
+                // [ LOOP EVALUATION ]
+                if (exec = (Re.LOOP_EVALUATION.exec(input))) {
+                    pushToken(exec[1], 'loop evaluation');
+                    input = '';
+                    i--;
+                    continue;
+                }
+
                 // [ FUNCTION DECLARATION ]
                 if (exec = (Re.FUNCTION_DELIMITER_START.exec(input))) {
                     pushToken(exec[1], 'function declaration');
@@ -386,22 +435,6 @@
                 // [ FUNCTION ARGUMENT SEPARATOR ]  
                 if (exec = (Re.FUNCTION_ARGUMENT_SEPARATOR.exec(input))) {
                     pushToken(exec[1], 'function argument delimiter');
-                    input = '';
-                    i--;
-                    continue;
-                }
-
-                // [ LOOP DELIMITER]
-                if (exec = (Re.LOOP_DELIMITER.exec(input))) {
-                    pushToken(exec[1], 'loop delimiter');
-                    input = '';
-                    i--;
-                    continue;
-                }
-
-                // [ LOOP EVALUATION ]
-                if (exec = (Re.LOOP_EVALUATION.exec(input))) {
-                    pushToken(exec[1], 'loop evaluation');
                     input = '';
                     i--;
                     continue;

@@ -1,7 +1,6 @@
-HAI
-    I HAS A pen
-    I HAS A pineaapple
-    GIMMEH pen
-    GIMMEH pineaapple
-    VISIBLE SMOOSH pen AN pineapple
+HAI 1.3
+I HAS A var
+IM IN YR loop UPPIN YR var TIL BOTH SAEM var AN 10
+    VISIBLE SMOOSH var AN " " MKAY!
+IM OUTTA YR loop2
 KTHXBYE
