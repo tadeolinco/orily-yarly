@@ -26,15 +26,16 @@
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
             CODE_DELIMITER                  : /((HAI)(?:\s+))|((?:\s+)(KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
-            VISIBLE                         : /(VISIBLE)\s+/,            
-            PARAMETER_DELIMETER             : /(AN)\s+/,
+            INPUT                           : /\s(VISIBLE)\s+/,
+            OUTPUT                          : /\s(GIMMEH)\s+/,
+            PARAMETER_DELIMETER             : /\s(AN)\s+/,
 
             // CONTROL FLOW
             CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
             CONDITIONAL_DELIMETER           : /\s(O RLY\?)\s+/,
             COMPARISON_BLOCK                : /\s(OMG|OMGWTF)\s+/,
-            CONTROL_FLOW_DELIMETER_END      : /(OIC)\s+/,
-            SWITCH_DELIMETER                : /(WTF\?)\s+/,
+            CONTROL_FLOW_DELIMETER_END      : /\s(OIC)\s+/,
+            SWITCH_DELIMETER                : /\s(WTF\?)\s+/,
 
             // DATA TYPE
             BOOLEAN                         : /\s(WIN|FAIL)\s+/,
@@ -51,20 +52,19 @@
 
             // OPERATORS
             MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
-            BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF)\s+/,
-            COMPARISON_OPERATORS            : /\s(BOTH SAEM|DIFFRINT)\s+/,
+            BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
             CONCATENATION                   : /\s(SMOOSH)\s+/,
             CASTING_IMPLICIT                : /\s(MAEK)\s+/,
             CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
             UNARY_OPERATORS                 : /\s(NERFIN|UPPIN)\s+/,
 
             // RETURN
-            RETURN_W_VALUE                  : /(FOUND YR)\s+/,
-            RETURN_W_O_VALUE                : /(GTFO)\s+/,
+            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
+            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
 
             // VARIABLE DECLARATION
-            DECLARATION_DELIMITER           : /(I HAS A)\s+/,
-            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/
+            DECLARATION_DELIMITER           : /\s(I HAS A)\s+/,
+            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/
         });
 
 
@@ -154,6 +154,7 @@
                     input = '';
                     continue;
                 }
+
                 // [ LINE COMMENT ]
                 if (exec = (Re.LINE_COMMENT_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'line comment delimiter');
@@ -203,15 +204,38 @@
                 }
 
                 // [ VISIBLE ]
-                if (exec = (Re.VISIBLE.exec(input))) {
+                if (exec = (Re.OUTPUT.exec(input))) {
                     pushToken(exec[1], 'output keyword');
                     input = '';
                     continue;
                 }
 
+                // [ GIMMEH ]
+                if (exec = (Re.INPUT.exec(input))) {
+                    pushToken(exec[1], 'input keyword');
+                    input = '';
+                    continue;
+                }
 
+                // [ MATH OPERATOR ]
+                if (exec = (Re.MATH_OPERATORS.exec(input))) {
+                    pushToken(exec[1], 'math operator');
+                    input = '';
+                    continue;
+                }
 
+                // [ BOOLEAN OPERATOR ]
+                if (exec = (Re.BOOLEAN_OPERATORS.exec(input))) {
+                    pushToken(exec[1], 'boolean operator');
+                    input = '';
+                    continue;
+                }
 
+                if (exec = (Re.PARAMETER_DELIMETER.exec(input))) {
+                    pushToken(exec[1], 'argument separator');
+                    input = '';
+                    continue;
+                }
             }
             if (vm.tokens.length === 0 || vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0] !== 'code delimiter') {
                 return { error: 'error code delimiter' }
