@@ -258,6 +258,25 @@
                     continue;
                 }
 
+                // [ CONCATENATION ]
+                if (exec = (Re.CONCATENATION.exec(input))) {
+                    pushToken(exec[1], 'concatenation');
+                    input = '';
+                    continue;
+                }
+
+                // [ CASTING ]
+                if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
+                    pushToken(exec[1], 'explicit casting');
+                    input = '';
+                    continue;
+                }
+                if (exec = (Re.CASTING_IMPLICIT.exec(input))) {
+                    pushToken(exec[1], 'implicit casting');
+                    input = '';
+                    continue;
+                }
+
                 // [ CONTROL FLOW DELIMITER END ]
                 if (exec = (Re.CONTROL_FLOW_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'control flow delimiter end');
@@ -272,8 +291,23 @@
                     continue;
                 }
 
+                // [ ARGUMENT SEPARATOR ]
                 if (exec = (Re.PARAMETER_DELIMETER.exec(input))) {
                     pushToken(exec[1], 'argument separator');
+                    input = '';
+                    continue;
+                }
+
+                // [ LOOP DELIMETER]
+                if (exec = (Re.LOOP_DELIMETER.exec(input))) {
+                    pushToken(exec[1], 'loop delimeter');
+                    input = '';
+                    continue;
+                }
+
+                // [ LOOP EVALUATION ]
+                if (exec = (Re.LOOP_EVALUATION.exec(input))) {
+                    pushToken(exec[1], 'loop evaluation');
                     input = '';
                     continue;
                 }
