@@ -1,4 +1,7 @@
 HAI
-I HAS A pen ITZ 2.3
-GIMMEH pen
+    I HAS A pen
+    I HAS A pineaapple
+    GIMMEH pen
+    GIMMEH pineaapple
+    VISIBLE SMOOSH pen AN pineapple
 KTHXBYE
