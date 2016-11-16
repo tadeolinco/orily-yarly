@@ -47,26 +47,24 @@
             FUNCTION_DELIMETER_START        : /\s(HOW IZ I)\s+/,
             FUNCTION_DELIMETER_START        : /\s(IF U SAY SO)\s+/,
             FUNCTION_ARGUMENT_SEPARATOR     : /\s(AN YR)\s+/,
+            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
+            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
 
             // LOOPS
             LOOP_DELIMETER                  : /\s(IM IN YR|IM OUTTA YR)\s+/,
             LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
 
             // OPERATORS
-            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
             BOOLEAN_OPERATORS               : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
             CONCATENATION                   : /\s(SMOOSH)\s+/,
             CASTING_IMPLICIT                : /\s(MAEK)\s+/,
             CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
+            MATH_OPERATORS                  : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
             UNARY_OPERATORS                 : /\s(NERFIN|UPPIN)\s+/,
 
-            // RETURN
-            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
-            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
-
             // VARIABLE DECLARATION
+            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/,
             DECLARATION_DELIMITER           : /\s(I HAS A)\s+/,
-            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/
         });
 
 
@@ -127,6 +125,22 @@
                         }
                     }
                     input = '';
+                }
+
+                // [ BOOLEAN ]
+                if (exec = (Re.BOOLEAN.exec(input))) {
+                    pushToken(exec[1], 'boolean');
+                    input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ DATA TYPE ]
+                if (exec = (Re.DATA_TYPE.exec(input))) {
+                    pushToken(exec[1], 'data type');
+                    input = '';
+                    i--;
+                    continue;
                 }
 
                 // [ CODE DELIMITER ]
@@ -253,7 +267,7 @@
                     continue;
                 }
 
-                // [ CONDITIONAL DELIMITER]
+                // [ CONDITIONAL DELIMITER ]
 
                 if (exec = (Re.CONDITIONAL_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'conditional delimiter');
@@ -274,6 +288,7 @@
                 if (exec = (Re.CONCATENATION.exec(input))) {
                     pushToken(exec[1], 'concatenation');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -281,11 +296,21 @@
                 if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
                     pushToken(exec[1], 'explicit casting');
                     input = '';
+                    i--;
                     continue;
                 }
                 if (exec = (Re.CASTING_IMPLICIT.exec(input))) {
                     pushToken(exec[1], 'implicit casting');
                     input = '';
+                    i--;
+                    continue;
+                }
+
+                // [ UNARY OPERATORS ]
+                if (exec = (Re.UNARY_OPERATORS.exec(input))) {
+                    pushToken(exec[1], 'unary operators');
+                    input = '';
+                    i--;
                     continue;
                 }
 
@@ -335,6 +360,7 @@
                 if (exec = (Re.LOOP_DELIMETER.exec(input))) {
                     pushToken(exec[1], 'loop delimeter');
                     input = '';
+                    i--;
                     continue;
                 }
 
@@ -342,6 +368,7 @@
                 if (exec = (Re.LOOP_EVALUATION.exec(input))) {
                     pushToken(exec[1], 'loop evaluation');
                     input = '';
+                    i--;
                     continue;
                 }
             }
