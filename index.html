@@ -2,11 +2,12 @@
 <html ng-app="app" ng-cloak>
 <head>
     <title>CMSC124 Project</title>
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="semantic/semantic.min.css">
+    <script src="semantic/semantic.min.js"></script>
 </head>
 <body>
     <div ng-controller="lexicalController as lex">
-        <button ng-click="lex.openFile();">Load File</button>
+        <button ng-click="lex.openFile();" class="ui button">Load File</button>
         <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
         <pre>
             <p>{{lex.text}}</p>
