@@ -1,3 +1,5 @@
 HAI
-    I HAS A pen ITZ "PINEAPPLE"
+    I HAS A pen ITZ 2.3
+    OBTW
+    TLDR
 KTHXBYE

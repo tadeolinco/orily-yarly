@@ -24,7 +24,7 @@
             LINE_COMMENT_DELIMITER          : /(BTW)$/,
             BLOCK_COMMENT_DELIMITER_START   : /(OBTW)$/,
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
-            CODE_DELIMITER                  : /((HAI)(?:\s+))|((?:\s+)(KTHXBYE))$/,
+            CODE_DELIMITER                  : /((HAI)\s+)|(\s+(KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
             INPUT                           : /\s(VISIBLE)\s+/,
             OUTPUT                          : /\s(GIMMEH)\s+/,
@@ -32,10 +32,11 @@
 
             // CONTROL FLOW
             CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
-            CONDITIONAL_DELIMETER           : /\s(O RLY\?)\s+/,
+            CONDITIONAL_DELIMITER           : /\s(O RLY\?)\s+/,
             COMPARISON_BLOCK                : /\s(OMG|OMGWTF)\s+/,
-            CONTROL_FLOW_DELIMETER_END      : /\s(OIC)\s+/,
-            SWITCH_DELIMETER                : /\s(WTF\?)\s+/,
+
+            CONTROL_FLOW_DELIMITER_END      : /(OIC)\s+/,
+            SWITCH_DELIMITER                : /(WTF\?)\s+/,
 
             // DATA TYPE
             BOOLEAN                         : /\s(WIN|FAIL)\s+/,
@@ -128,6 +129,7 @@
 
                 // [ CODE DELIMITER ]
                 if (exec = (Re.CODE_DELIMITER.exec(input))) {
+                    console.log(exec);
                     if (exec[2])
                         pushToken(exec[2], 'code delimiter');
                     if (exec[4])
@@ -172,9 +174,11 @@
                 if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'declaration delimiter');
                     input = '';
-                    do {
-                        input += chars[++i];
-                    } while (Re.WHITESPACE.test(chars[i]))
+                    while (!Re.WHITESPACE.test(chars[++i])) {
+                        input += chars[i];
+                    } 
+                    console.log('variable: '+input)
+                    console.log('length: '+input.length)
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'variable identifier');
                         pushSymbol(input);
@@ -224,9 +228,46 @@
                     continue;
                 }
 
+
                 // [ BOOLEAN OPERATOR ]
                 if (exec = (Re.BOOLEAN_OPERATORS.exec(input))) {
                     pushToken(exec[1], 'boolean operator');
+                    input = '';
+                    continue;
+                }
+
+                // [ CONDITIONAL BLOCK ]
+                if (exec = (Re.CONDITIONAL_BLOCK.exec(input))) {
+                    pushToken(exec[1], 'conditional block');
+                    input = '';
+                    continue;
+                }
+
+                // [ CONDITIONAL DELIMITER]
+
+                if (exec = (Re.CONDITIONAL_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'conditional delimiter');
+                    input = '';
+                    continue;
+                }
+
+                // [ COMPARISON BLOCK ]
+                if (exec = (Re.COMPARISON_BLOCK.exec(input))) {
+                    pushToken(exec[1], 'comparison block');
+                    input = '';
+                    continue;
+                }
+
+                // [ CONTROL FLOW DELIMITER END ]
+                if (exec = (Re.CONTROL_FLOW_DELIMITER_END.exec(input))) {
+                    pushToken(exec[1], 'control flow delimiter end');
+                    input = '';
+                    continue;
+                }
+
+                // [ SWITCH DELIMITER ]
+                if (exec = (Re.SWITCH_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'switch delimiter');
                     input = '';
                     continue;
                 }
@@ -237,7 +278,7 @@
                     continue;
                 }
             }
-            if (vm.tokens.length === 0 || vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0] !== 'code delimiter') {
+            if (vm.tokens.length === 0 || vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0].classification !== 'code delimiter') {
                 return { error: 'error code delimiter' }
             } 
             return { success: 'Success in analyzing ' }
