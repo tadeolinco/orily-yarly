@@ -10,7 +10,9 @@
         vm.text = "";
         vm.tokens = [];
         vm.symbols = [];
+        vm.results = null;
 
+        vm.initialize = initialize;
         vm.loadFile = loadFile;
         vm.openFile = openFile;
 
@@ -24,48 +26,49 @@
             LINE_COMMENT_DELIMITER          : /\s(BTW)$/,
             BLOCK_COMMENT_DELIMITER_START   : /(OBTW)$/,
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
-            CODE_DELIMITER                  : /((HAI)\s+)|(\s+(KTHXBYE))$/,
+            CODE_DELIMITER                  : /((HAI)\s+)|((KTHXBYE))$/,
             VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
-            OUTPUT                          : /\s(VISIBLE)\s+/,
-            INPUT                           : /\s(GIMMEH)\s+/,
-            PARAMETER_DELIMITER             : /\s(AN)\s+/,
+            OUTPUT                          : /(VISIBLE)\s+/,
+            INPUT                           : /(GIMMEH)\s+/,
+            PARAMETER_DELIMITER             : /(AN)\s+/,
 
             // CONTROL FLOW
-            CONDITIONAL_BLOCK               : /\s(YA RLY|NO WAI|MEBBE)\s+/,
-            CONDITIONAL_DELIMITER           : /\s(O RLY\?)\s+/,
-            COMPARISON_BLOCK                : /\s(OMG|OMGWTF)\s+/,
+            CONDITIONAL_BLOCK               : /(YA RLY|NO WAI|MEBBE)\s+/,
+            CONDITIONAL_DELIMITER           : /(O RLY\?)\s+/,
+            COMPARISON_BLOCK                : /(OMG|OMGWTF)\s+/,
 
-            CONTROL_FLOW_DELIMITER_END      : /\s(OIC)\s+/,
-            SWITCH_DELIMITER                : /\s(WTF\?)\s+/,
+            CONTROL_FLOW_DELIMITER_END      : /(OIC)\s+/,
+            SWITCH_DELIMITER                : /(WTF\?)\s+/,
 
             // DATA TYPE
-            BOOLEAN                         : /\s(WIN|FAIL)\s+/,
-            DATA_TYPE                       : /\s(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s/,
-
-            // FUNCTION
-            FUNCTION_CALL                   : /\s(I IZ)\s+/,
-            FUNCTION_DELIMITER_START        : /\s(HOW IZ I)\s+/,
-            FUNCTION_DELIMITER_END          : /\s(IF U SAY SO)\s+/,
-            FUNCTION_ARGUMENT_SEPARATOR     : /\s(YR)\s+/,
-            RETURN_W_VALUE                  : /\s(FOUND YR)\s+/,
-            RETURN_W_O_VALUE                : /\s(GTFO)\s+/,
+            BOOLEAN                         : /(WIN|FAIL)\s+/,
+            DATA_TYPE                       : /(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s/,
 
             // LOOPS
-            LOOP_DELIMITER_START            : /\s(IM IN YR)\s+/,
-            LOOP_DELIMITER_END              : /\s(IM OUTTA YR)\s+/,
-            LOOP_EVALUATION                 : /\s(TIL|WILE)\s+/,
+            LOOP_DELIMITER_START            : /(IM IN YR)\s+/,
+            LOOP_DELIMITER_END              : /(IM OUTTA YR)\s+/,
+            LOOP_EVALUATION                 : /(TIL|WILE)\s+/,
+            
+            // FUNCTION
+            RETURN_W_VALUE                  : /(FOUND YR)\s+/,
+            RETURN_W_O_VALUE                : /(GTFO)\s+/,
+            FUNCTION_CALL                   : /(I IZ)\s+/,
+            FUNCTION_DELIMITER_START        : /(HOW IZ I)\s+/,
+            FUNCTION_DELIMITER_END          : /(IF U SAY SO)\s+/,
+            FUNCTION_ARGUMENT_SEPARATOR     : /(YR)\s+/,
+
 
             // OPERATOR
-            BOOLEAN_OPERATOR                : /\s(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
-            CONCATENATION                   : /\s(SMOOSH)\s+/,
-            CASTING_IMPLICIT                : /\s(MAEK)\s+/,
-            CASTING_EXPLICIT                : /\s(IS NOW A|R MAEK)\s+/,
-            MATH_OPERATOR                   : /\s(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
-            UNARY_OPERATOR                  : /\s(NERFIN|UPPIN)\s+/,
+            BOOLEAN_OPERATOR                : /(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
+            CONCATENATION                   : /(SMOOSH)\s+/,
+            CASTING_IMPLICIT                : /(MAEK)\s+/,
+            CASTING_EXPLICIT                : /(IS NOW A)\s+/,
+            MATH_OPERATOR                   : /(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
+            UNARY_OPERATOR                  : /(NERFIN|UPPIN)\s+/,
 
             // VARIABLE DECLARATION
-            ASSIGNMENT_OPERATOR             : /\s(R|ITZ)\s+/,
-            DECLARATION_DELIMITER           : /\s(I HAS A)\s+/,
+            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/,
+            DECLARATION_DELIMITER           : /(I HAS A)\s+/,
         });
 
 
@@ -77,6 +80,10 @@
             var input = '';
             var exec = null;
             for (let i=0; i < chars.length; i++) {
+                console.log('['+input+']');
+                if (input === '' && Re.WHITESPACE.test(chars[i])) {
+                    continue;
+                }
                 input += chars[i];
 
                 // [ STRING ]
@@ -107,7 +114,7 @@
                         if (Re.INTEGER.exec(input)) {
                             pushToken(input, 'integer literal');
                             input = ''
-                            i--;
+                            
                             continue;
                         }
 
@@ -115,7 +122,7 @@
                         if (Re.FLOAT.exec(input)) {
                             pushToken(input, 'floating-point literal');
                             input = '';
-                            i--;
+                            
                             continue;
                         }
                     }
@@ -124,9 +131,9 @@
 
                 // [ BOOLEAN ]
                 if (exec = (Re.BOOLEAN.exec(input))) {
-                    pushToken(exec[1], 'boolean');
+                    pushToken(exec[1], 'boolean literal');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -134,7 +141,7 @@
                 if (exec = (Re.DATA_TYPE.exec(input))) {
                     pushToken(exec[1], 'data type');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -145,7 +152,7 @@
                     if (exec[4])
                         pushToken(exec[4], 'code delimiter');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -164,7 +171,7 @@
                         pushToken(exec[1], 'block comment');
                         pushToken(exec[2], 'block comment delimiter');
                         input = '';
-                        i--;
+                        
                         continue;
                     } else {
                         return { error: 'block comment error' }
@@ -180,44 +187,18 @@
                     }                        
                     pushToken(input, 'line comment');
                     input = '';
-                    i--;
-                    continue;
-                }
-
-                // [ VARIABLE DECLARATION ]
-                if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
-                    pushToken(exec[1], 'declaration delimiter');
-                    input = '';
-                    while (!Re.WHITESPACE.test(chars[++i])) {
-                        input += chars[i];
-                    } 
-                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
-                        pushToken(input, 'variable identifier');
-                        pushSymbol(input);
-                        input = '';
-                    } else {
-                        return { error: 'invalid variable identifier name: '+ input }
-                    }
-                    i--;
-                    continue;
-                }
-
-                // [ VARIABLE ASSIGNMENT ]
-                if (exec = (Re.ASSIGNMENT_OPERATOR.exec(input))) {
-                    pushToken(exec[1], 'assignment operator');
-                    input = '';
-                    i--;
+                    
                     continue;
                 }
 
                 // [ KNOWN VARIABLE IDENTIFIERS ]
                 if (exec = (Re.VARIABLE_IDENTIFIER).exec(input)) {
-                    console.log('['+exec[1]+']');
+                    //console.log('['+exec[1]+']');
                     for (symbol of vm.symbols) {
                         if (symbol.identifier == exec[1]) {
                             pushToken(exec[1], 'variable identifier');
                             input = '';
-                            i--;
+                            
                             continue;
                         }
                     }
@@ -227,7 +208,7 @@
                 if (exec = (Re.OUTPUT.exec(input))) {
                     pushToken(exec[1], 'output keyword');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -235,7 +216,7 @@
                 if (exec = (Re.INPUT.exec(input))) {
                     pushToken(exec[1], 'input keyword');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -243,7 +224,7 @@
                 if (exec = (Re.MATH_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'math operator');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -252,7 +233,7 @@
                 if (exec = (Re.BOOLEAN_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'boolean operator');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -260,7 +241,7 @@
                 if (exec = (Re.CONDITIONAL_BLOCK.exec(input))) {
                     pushToken(exec[1], 'conditional block');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -269,7 +250,7 @@
                 if (exec = (Re.CONDITIONAL_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'conditional delimiter');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -277,7 +258,7 @@
                 if (exec = (Re.COMPARISON_BLOCK.exec(input))) {
                     pushToken(exec[1], 'comparison block');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -285,7 +266,7 @@
                 if (exec = (Re.CONCATENATION.exec(input))) {
                     pushToken(exec[1], 'concatenation');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -293,13 +274,13 @@
                 if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
                     pushToken(exec[1], 'explicit casting');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
                 if (exec = (Re.CASTING_IMPLICIT.exec(input))) {
                     pushToken(exec[1], 'implicit casting');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -307,7 +288,7 @@
                 if (exec = (Re.UNARY_OPERATOR.exec(input))) {
                     pushToken(exec[1], 'unary operator');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -315,7 +296,7 @@
                 if (exec = (Re.CONTROL_FLOW_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'control flow delimiter end');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -323,7 +304,7 @@
                 if (exec = (Re.SWITCH_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'switch delimiter');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -331,7 +312,7 @@
                 if (exec = (Re.PARAMETER_DELIMITER.exec(input))) {
                     pushToken(exec[1], 'parameter delimiter');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -340,16 +321,19 @@
                 if (exec = (Re.LOOP_DELIMITER_START.exec(input))) {
                     pushToken(exec[1], 'loop delimiter start');
                     input = '';
-                    while (!Re.WHITESPACE.test(chars[++i])) {
-                        input += chars[i];
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
                     }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
+                    } 
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'loop label');
                         input = '';
                     } else {
                         return { error: 'invalid loop label name: '+ input }
                     }
-                    i--;
+                    
                     continue;
                 }
 
@@ -357,9 +341,12 @@
                 if (exec = (Re.LOOP_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'loop delimiter end');
                     input = '';
-                    while (!Re.WHITESPACE.test(chars[++i])) {
-                        input += chars[i];
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
                     }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
+                    } 
                     var found = false;
                     for (token of vm.tokens) {
                         if (token.lexeme === input && token.classification === 'loop label') {
@@ -369,7 +356,7 @@
                         }
                     }
                     if (found) {
-                        i--;
+                        
                         continue;
                     } else {
                         return { error: 'no such loop label' };
@@ -380,7 +367,21 @@
                 if (exec = (Re.LOOP_EVALUATION.exec(input))) {
                     pushToken(exec[1], 'loop evaluation');
                     input = '';
-                    i--;
+                    
+                    continue;
+                }
+
+                if (exec = (Re.RETURN_W_VALUE.exec(input))) {
+                    pushToken(exec[1], 'return delimiter');
+                    input = '';
+                    
+                    continue;
+                }
+
+                if (exec = (Re.RETURN_W_O_VALUE.exec(input))) {
+                    pushToken(exec[1], 'return delimiter');
+                    input = '';
+                    
                     continue;
                 }
 
@@ -388,17 +389,20 @@
                 if (exec = (Re.FUNCTION_DELIMITER_START.exec(input))) {
                     pushToken(exec[1], 'function declaration');
                     input = '';
-                    while (!Re.WHITESPACE.test(chars[++i])) {
-                        input += chars[i];
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
+                    }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
                     } 
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'function identifier');
-                        pushSymbol(input);
+                        pushSymbol(input, 'function');
                         input = '';
                     } else {
                         return { error: 'invalid function identifier name: '+ input }
                     }
-                    i--;
+                    
                     continue;
                 }
 
@@ -406,7 +410,7 @@
                 if (exec = (Re.FUNCTION_DELIMITER_END.exec(input))) {
                     pushToken(exec[1], 'function declaration end');
                     input = '';
-                    i--;
+                    
                     continue;
                 }
 
@@ -414,9 +418,12 @@
                 if (exec = (Re.FUNCTION_CALL.exec(input))) {
                     pushToken(exec[1], 'function call delimiter');
                     input = '';
-                    while (!Re.WHITESPACE.test(chars[++i])) {
-                        input += chars[i];
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
                     }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
+                    } 
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         for (symbol of vm.symbols) {
                             if (symbol.identifier === exec[1]) {
@@ -426,7 +433,7 @@
                     } else {
                         return { error: 'invalid function identifier name: '+ input }
                     }
-                    i--;
+                    
                     continue;
                 }         
 
@@ -434,34 +441,80 @@
                 if (exec = (Re.FUNCTION_ARGUMENT_SEPARATOR.exec(input))) {
                     pushToken(exec[1], 'function argument delimiter');
                     input = '';
-                    i--;
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
+                    }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
+                    } 
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'variable identifier');
+                        pushSymbol(input, 'NOOB');
+                        input = '';
+                    } else {
+                        return { error: 'invalid variable identifier name: '+ input }
+                    }
+                    continue;
+                }
+
+                // [ VARIABLE DECLARATION ]
+                if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
+                    pushToken(exec[1], 'declaration delimiter');
+                    input = '';
+                    while(Re.WHITESPACE.test(chars[i])) {
+                        i++;
+                    }
+                    while (!Re.WHITESPACE.test(chars[i])) {
+                        input += chars[i++];
+                    } 
+                    if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
+                        pushToken(input, 'variable identifier');
+                        pushSymbol(input, 'NOOB');
+                        input = '';
+                    } else {
+                        return { error: 'invalid variable identifier name: '+ input }
+                    }
+                    
+                    continue;
+                }
+
+                // [ VARIABLE ASSIGNMENT ]
+                if (exec = (Re.ASSIGNMENT_OPERATOR.exec(input))) {
+                    pushToken(exec[1], 'assignment operator');
+                    input = '';
+                    
                     continue;
                 }
             }
-            if (vm.tokens.length === 0 || vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0].classification !== 'code delimiter') {
+            if (vm.tokens.length < 2) {
                 return { error: 'error code delimiter' }
-            } 
+            } else if  (vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0].classification !== 'code delimiter') {
+                return { error: 'error code delimiter' }
+            }
             return { success: 'Success in analyzing ' }
         }
-
+        function initialize() {
+            vm.tokens = [];
+            vm.symbols = [];
+            vm.results = analyze();
+            if (vm.results.error) {
+                console.log('ERROR: '+vm.results.error);
+                $('#ERROR').modal('show');
+            } else {
+                console.log('SUCCESS');
+            }
+            console.log('\n\nTOKENS:')
+            console.log(vm.tokens);
+            console.log('SYMBOLS:')
+            console.log(vm.symbols);
+            $scope.$apply();
+        }
 
         function loadFile() {
             var reader = new FileReader();
             reader.onload = function() {
                 vm.text = reader.result;
-                vm.tokens = [];
-                var results = analyze();
-                if (results.error) {
-                    console.log('ERROR: '+results.error);
-                    $('#ERROR').modal('show');
-                } else {
-                    console.log('SUCCESS');
-                }
-                console.log('\n\nTOKENS:')
-                console.log(vm.tokens);
-                console.log('SYMBOLS:')
-                console.log(vm.symbols);
-                $scope.$apply();
+                initialize();
             }
             reader.readAsText(vm.file);
         }
@@ -479,10 +532,12 @@
             });
         }
 
-        function pushSymbol(input) {
+        function pushSymbol(input, type) {
             console.log('Pushed symbol ['+input+']');
             vm.symbols.push({
                 identifier: input,
+                type: type,
+                value: ''
             });
         }
 

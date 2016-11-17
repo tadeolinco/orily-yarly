@@ -1,10 +1,10 @@
 HAI
-    I HAS A pen 
-    OBTW this TLDR 
-    I HAS A pineapple
-    GIMMEH pen
-    GIMMEH pineapple
-    VISIBLE SMOOSH pen AN pineapple
-    pen R SUM OF 5 AN pineapple
-    pen IS NOW A NUMBR
+    I HAS A pen
+    pen R "pineapple"
+    HOW IZ I hello YR wut
+        BOTH SAEM wut AN 5
+        O RLY?
+
+        OIC
+    IF U SAY SO
 KTHXBYE
