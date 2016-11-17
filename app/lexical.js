@@ -27,7 +27,7 @@
             BLOCK_COMMENT_DELIMITER_START   : /(OBTW)$/,
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
             CODE_DELIMITER                  : /((HAI)\s+)|((KTHXBYE))$/,
-            VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)$/,
+            VARIABLE_IDENTIFIER             : /([a-zA-Z][a-zA-Z_]*)\b/,
             OUTPUT                          : /(VISIBLE)\s+/,
             INPUT                           : /(GIMMEH)\s+/,
             PARAMETER_DELIMITER             : /(AN)\s+/,
@@ -67,7 +67,7 @@
             UNARY_OPERATOR                  : /(NERFIN|UPPIN)\s+/,
 
             // VARIABLE DECLARATION
-            ASSIGNMENT_OPERATOR             : /(R|ITZ)\s+/,
+            ASSIGNMENT_OPERATOR             : /(\bR\b|ITZ)\s+/,
             DECLARATION_DELIMITER           : /(I HAS A)\s+/,
         });
 
@@ -502,18 +502,25 @@
                 }
                 // [ KNOWN VARIABLE IDENTIFIERS ]
                 if (exec = (Re.VARIABLE_IDENTIFIER).exec(input)) {
-                    //console.log('['+exec[1]+']');
-                    var found = false;
-                    for (symbol of vm.symbols) {
-                        if (symbol.identifier == exec[1]) {
-                            pushToken(exec[1], 'variable identifier');
-                            input = '';
-                            break;
-                        }
-                    }
-                    if (found) {
-                        continue;
-                    }
+					var input1= input;
+					var exec1 = null;
+					input1+= chars[i+1]; //double check if preceding is space
+					if(exec1= (Re.VARIABLE_IDENTIFIER).exec(input1)){	
+						//console.log('['+exec[1]+']');
+						var found = false;
+						for (symbol of vm.symbols) {
+							if (symbol.identifier == exec1[1]) {
+								pushToken(exec1[1], 'variable identifier');
+								input=input1;
+								input = '';
+								i++;
+								break;
+							}
+						}
+						if (found) {
+							continue;
+						}
+					}
                 }
             }
             if (vm.tokens.length < 2) {
