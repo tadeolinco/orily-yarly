@@ -8,24 +8,26 @@
 
     <div ng-controller="lexicalController as lex" class="ui centered padded grid">
         <div class = "ui centered row">
-            <div class = "five wide column" style="overflow-y:scroll;white-space:nowrap;height:50vh">
+            <div class = "four wide column">
                 <div class="ui header"><center>Code</center></div>
-                <div class="description">
+                <div class="ui padded segment" style="overflow-y:auto;white-space:nowrap;height:50vh">
                     <center>
                     <button ng-click="lex.openFile();" class="ui button">Open File</button>
                     </center>
                     <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
-                    <pre>
-                        <p>{{lex.text}}</p>
-                    </pre>
+                    <div class="ui padded segment">
+                        <pre>
+                            <p>{{lex.text}}</p>
+                        </pre>
+                    </div>
                 </div>
             </div>
 
-            <div class = "five wide column" style="overflow-y:scroll;white-space:nowrap;height:50vh">
+            <div class = "four wide column">
                 <div class="ui header"><center>Lexemes</center></div>
-                <center>
+                <div class="ui segment" style="overflow-y:auto;white-space:nowrap;height:50vh">
                 <table class="ui celled table">
-                    <thead>
+                    <thead class>
                         <tr><th><center>Lexeme</center></th>
                         <th><center>Classification</center></th>
                     </tr></thead>
@@ -36,48 +38,73 @@
                         </tr>
                     </tbody>
                 </table>
-                </center>
+                </div>
             </div>
 
-            <div class = "five wide column">
+            <div class = "four wide column">
             <div class="ui header"><center>Symbol Table</center></div>
                    <center>
+                   <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:50vh">
                     <table class="ui celled table">
                         <thead>
                             <tr><th><center>Identifier</center></th>
+                            <th><center>Type</center></th>
                             <th><center>Value</center></th>
                         </tr></thead>
                         <tbody>
                             <tr ng-repeat="symbol in lex.symbols">
                                 <td>{{symbol.identifier}}</td>
+                                <td>{{symbol.type}}</td>
                                 <td></td>
                             </tr>
                         </tbody>
                     </table>
                     </center>
                 </div>
-        </div>
+            </div>
         <div class = "row">
-            <div class = "fifteen wide column">
+            <div class = "twelve wide column">
                 <button class ="fluid ui button">Execute</button>
             </div>
         </div>
-        <div class="ui basic modal" id="ERROR">
-            <div class="header">
-                I HAS A ERROR ITZ "U"
+        <div class ="row">
+            <div class = "twelve wide column">
+                <h3 class="ui top attached segment">Console</h3>
+                <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:25vh">
+                </div>
             </div>
-            <div class="content">
-                {{lex.results.error}}
+
+
+        <div class="ui basic modal" id="ERROR">
+            <i class="close icon"></i>
+            <div class="header">
+                I HAS ERROR
+            </div>
+            <div class="image content">
+                <div class="image">
+                    <i class="warning circle icon"></i>
+                </div>
+                <div class="description">
+                    <p>ITZ U. Check your syntax! Mkay? Mkay.</p>
+                    <p>ERROR: "{{lex.results.error}}"</p>
+                </div>
             </div>
             <div class="actions">
-                
-            </div>
+                <div class="two fluid ui inverted buttons">
+                    <div class="ui ok red basic inverted button">
+                    <i class="checkmark icon"></i>
+                        OIC
+                    </div>
+                </div>
+             </div>
         </div>
     </div>
 
 
+
     <script type="text/javascript" src="js/jquery.js"></script>
     <script src="semantic/semantic.min.js"></script>
+    <script src="js/sticky.js"></script>
     <script type="text/javascript" src="js/angular.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <script type="text/javascript" src="app/ng-file-input.js"></script>

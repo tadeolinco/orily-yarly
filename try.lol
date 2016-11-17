@@ -1,10 +1,18 @@
 HAI
-    I HAS A pen
-    pen R "pineapple"
-    HOW IZ I hello YR wut
-        BOTH SAEM wut AN 5
-        O RLY?
-
-        OIC
-    IF U SAY SO
+    I HAS A i ITZ 0
+    IM IN YR loopin UPPIN YR i TIL BOTH SAEM i AN 5
+        VISIBLE i
+    IM OUTTA YR loopin
+    I HAS A i ITZ 0
+    IM IN YR loopin UPPIN YR i TIL BOTH SAEM i AN 5
+        VISIBLE i
+    IM OUTTA YR loopin
+    I HAS A i ITZ 0
+    IM IN YR loopin UPPIN YR i TIL BOTH SAEM i AN 5
+        VISIBLE i
+    IM OUTTA YR loopin
+    I HAS A i ITZ 0
+    IM IN YR loopin UPPIN YR i TIL BOTH SAEM i AN 5
+        VISIBLE i
+    IM OUTTA YR loopin
 KTHXBYE

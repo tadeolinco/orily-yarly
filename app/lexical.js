@@ -42,7 +42,7 @@
 
             // DATA TYPE
             BOOLEAN                         : /(WIN|FAIL)\s+/,
-            DATA_TYPE                       : /(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s/,
+            DATA_TYPE                       : /(YARN|NUMBR|NUMBAR|TROOF|NOOB)\s+/,
 
             // LOOPS
             LOOP_DELIMITER_START            : /(IM IN YR)\s+/,
@@ -80,7 +80,7 @@
             var input = '';
             var exec = null;
             for (let i=0; i < chars.length; i++) {
-                console.log('['+input+']');
+                //console.log('['+input+']');
                 if (input === '' && Re.WHITESPACE.test(chars[i])) {
                     continue;
                 }
@@ -94,7 +94,7 @@
                         input += chars[i];
                     }   
                     if (i == chars.length) {
-                        return { error: 'string no delimiter' }
+                        return { error: 'String not ended' }
                     }
                     pushToken(input, 'string literal');         // push string literal
                     pushToken(chars[i], 'string delimiter');    // push ending delimiter
@@ -166,7 +166,7 @@
                             input += chars[++i]
                         }
                         if (!exec) {
-                            return { error: 'block comment no delimiter' };
+                            return { error: 'Block comment not ended' };
                         }
                         pushToken(exec[1], 'block comment');
                         pushToken(exec[2], 'block comment delimiter');
@@ -174,7 +174,7 @@
                         
                         continue;
                     } else {
-                        return { error: 'block comment error' }
+                        return { error: 'Block comment delimiter must be placed on different line' }
                     }
                 }
 
@@ -193,14 +193,17 @@
 
                 // [ KNOWN VARIABLE IDENTIFIERS ]
                 if (exec = (Re.VARIABLE_IDENTIFIER).exec(input)) {
-                    //console.log('['+exec[1]+']');
+                    console.log('['+exec[1]+']');
+                    var found = false;
                     for (symbol of vm.symbols) {
                         if (symbol.identifier == exec[1]) {
                             pushToken(exec[1], 'variable identifier');
                             input = '';
-                            
-                            continue;
+                            break;
                         }
+                    }
+                    if (found) {
+                        continue;
                     }
                 }
 
@@ -331,7 +334,7 @@
                         pushToken(input, 'loop label');
                         input = '';
                     } else {
-                        return { error: 'invalid loop label name: '+ input }
+                        return { error: 'Invalid loop label name: ['+ input +']'}
                     }
                     
                     continue;
@@ -356,10 +359,10 @@
                         }
                     }
                     if (found) {
-                        
+                        input = '';
                         continue;
                     } else {
-                        return { error: 'no such loop label' };
+                        return { error: 'Loop label does not exist: ['+input+']'};
                     }
                 }
 
@@ -400,7 +403,7 @@
                         pushSymbol(input, 'function');
                         input = '';
                     } else {
-                        return { error: 'invalid function identifier name: '+ input }
+                        return { error: 'Invalid function identifier name: ['+ input +']'}
                     }
                     
                     continue;
@@ -431,7 +434,7 @@
                             }
                         }
                     } else {
-                        return { error: 'invalid function identifier name: '+ input }
+                        return { error: 'Invalid function identifier name: ['+ input +']'}
                     }
                     
                     continue;
@@ -449,10 +452,19 @@
                     } 
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'variable identifier');
-                        pushSymbol(input, 'NOOB');
+                        var found = false;
+                        for (symbol of vm.symbols) {
+                            if (symbol.identifier === input) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            pushSymbol(input, 'NOOB');
+                        }
                         input = '';
                     } else {
-                        return { error: 'invalid variable identifier name: '+ input }
+                        return { error: 'Invalid variable identifier name: ['+ input +']'}
                     }
                     continue;
                 }
@@ -487,9 +499,9 @@
                 }
             }
             if (vm.tokens.length < 2) {
-                return { error: 'error code delimiter' }
+                return { error: 'No code delimiter' }
             } else if  (vm.tokens[vm.tokens.length-1].classification !== 'code delimiter' || vm.tokens[0].classification !== 'code delimiter') {
-                return { error: 'error code delimiter' }
+                return { error: 'No code delimiter' }
             }
             return { success: 'Success in analyzing ' }
         }
