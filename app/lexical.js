@@ -21,7 +21,7 @@
             FLOAT                           : /^((-\d*\.\d+)|(-?\d+\.\d+))$/,
             INTEGER                         : /^((0)|(-?[1-9]\d*))$/,
             WHITESPACE                      : /\s/, 
-            LINE_COMMENT_DELIMITER          : /(BTW)$/,
+            LINE_COMMENT_DELIMITER          : /\s(BTW)$/,
             BLOCK_COMMENT_DELIMITER_START   : /(OBTW)$/,
             BLOCK_COMMENT_DELIMITER_END     : /([\S\s]*\n[\S\s]*)(TLDR)$/, 
             CODE_DELIMITER                  : /((HAI)\s+)|(\s+(KTHXBYE))$/,
@@ -152,19 +152,23 @@
 
                 // [ BLOCK COMMENT ]
                 if (exec = Re.BLOCK_COMMENT_DELIMITER_START.exec(input)) {
-                    pushToken(exec[1], 'block comment delimiter');
-                    input = '';
-                    while(!(exec = Re.BLOCK_COMMENT_DELIMITER_END.exec(input)) && i < chars.length) {
-                        input += chars[++i]
+                    if (/\s*\n\s*OBTW$/.exec(input)) {
+                        pushToken(exec[1], 'block comment delimiter');
+                        input = '';
+                        while(!(exec = Re.BLOCK_COMMENT_DELIMITER_END.exec(input)) && i < chars.length) {
+                            input += chars[++i]
+                        }
+                        if (!exec) {
+                            return { error: 'block comment no delimiter' };
+                        }
+                        pushToken(exec[1], 'block comment');
+                        pushToken(exec[2], 'block comment delimiter');
+                        input = '';
+                        i--;
+                        continue;
+                    } else {
+                        return { error: 'block comment error' }
                     }
-                    if (!exec) {
-                        return { error: 'block comment no delimiter' };
-                    }
-                    pushToken(exec[1], 'block comment');
-                    pushToken(exec[2], 'block comment delimiter');
-                    input = '';
-                    i--;
-                    continue;
                 }
 
                 // [ LINE COMMENT ]
@@ -449,6 +453,7 @@
                 var results = analyze();
                 if (results.error) {
                     console.log('ERROR: '+results.error);
+                    $('#ERROR').modal('show');
                 } else {
                     console.log('SUCCESS');
                 }

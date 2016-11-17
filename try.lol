@@ -1,7 +1,6 @@
 HAI
-    I HAS A pen
-    OBTW this is a declaration
-    of variable TLDR 
+    I HAS A pen 
+    OBTW this TLDR 
     I HAS A pineapple
     GIMMEH pen
     GIMMEH pineapple
