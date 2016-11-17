@@ -75,10 +75,12 @@
 
 
         function analyze() {
+            vm.symbols = [];
             vm.tokens = [];
             var chars = vm.text.split('');
             var input = '';
             var exec = null;
+            pushSymbol('IT', 'NOOB');
             for (let i=0; i < chars.length; i++) {
                 //console.log('['+input+']');
                 if (input === '' && Re.WHITESPACE.test(chars[i])) {
