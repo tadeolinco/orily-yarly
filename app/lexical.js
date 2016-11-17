@@ -511,7 +511,7 @@
 						for (symbol of vm.symbols) {
 							if (symbol.identifier == exec1[1]) {
 								pushToken(exec1[1], 'variable identifier');
-								input=input1;
+								input = input1;
 								input = '';
 								i++;
 								break;
