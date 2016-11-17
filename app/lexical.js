@@ -481,7 +481,16 @@
                     } 
                     if (exec = (Re.VARIABLE_IDENTIFIER.exec(input))) {
                         pushToken(input, 'variable identifier');
-                        pushSymbol(input, 'NOOB');
+                        var found = false;
+                        for (symbol of vm.symbols) {
+                            if (symbol.identifier === input) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            pushSymbol(input, 'NOOB');
+                        }
                         input = '';
                     } else {
                         return { error: 'invalid variable identifier name: '+ input }
