@@ -1,4 +1,9 @@
 HAI 1.2
+OBTW
+  asdasdasd
+  weqweqwe
+  asdasdqweq
+  TLDR
 I HAS A newvar ITZ -5
 I HAS A x ITZ 5
 I HAS A y ITZ 3

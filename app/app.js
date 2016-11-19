@@ -1,1 +1,3 @@
-angular.module('app', ['ng-file-input']);
+(function() {
+    angular.module('app', ['ng-file-input']);
+})();

@@ -7,19 +7,19 @@
 </head>
 <body>
 
-    <div ng-controller="lexicalController as lex" class="ui centered padded grid">
+    <div ng-controller="lolController as lol" class="ui centered padded grid">
         <div class = "ui centered row">
             <div class = "four wide column">
                 <div class="ui header"><center>Code</center></div>
                 <div class="ui padded segment" style="overflow-y:auto;white-space:nowrap;height:50vh">
                     <center>
-                    <button ng-click="lex.openFile();" class="ui button">Open File</button>
+                    <button ng-click="lol.openFile();" class="ui button">Open File</button>
                     </center>
-                    <input type="file" id="file" style="display: none;" ng-model="lex.file" ng-change="lex.loadFile()">
-                    <div class="ui padded segment">
-                        <pre>
-                            <p>{{lex.text}}</p>
-                        </pre>
+                    <input type="file" id="file" style="display: none;" ng-model="lol.file" ng-change="lol.loadFile()">
+                    <div class="ui padded segment form">
+                        <div class="field">
+                            <textarea ng-model="lol.text" id="textbox" rows="14"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                         <th><center>Classification</center></th>
                     </tr></thead>
                     <tbody>
-                        <tr ng-repeat="token in lex.tokens">
+                        <tr ng-repeat="token in lol.tokens">
                             <td> {{token.lexeme}}</td>
                             <td> {{token.classification}}</td>
                         </tr>
@@ -53,7 +53,7 @@
                             <th><center>Value</center></th>
                         </tr></thead>
                         <tbody>
-                            <tr ng-repeat="symbol in lex.symbols">
+                            <tr ng-repeat="symbol in lol.symbols">
                                 <td>{{symbol.identifier}}</td>
                                 <td>{{symbol.type}}</td>
                                 <td></td>
@@ -65,7 +65,7 @@
             </div>
         <div class = "row">
             <div class = "twelve wide column">
-                <button class ="fluid ui button">Execute</button>
+                <button class ="fluid ui button" ng-click="lol.execute()">Execute</button>
             </div>
         </div>
         <div class ="row">
@@ -87,7 +87,7 @@
                 </div>
                 <div class="description">
                     <p>ITZ U. Check your syntax! Mkay? Mkay.</p>
-                    <p>ERROR: "{{lex.results.error}}"</p>
+                    <p>ERROR: "{{lol.results.error}}"</p>
                 </div>
             </div>
             <div class="actions">
@@ -106,10 +106,12 @@
     <script type="text/javascript" src="js/jquery.js"></script>
     <script src="semantic/semantic.min.js"></script>
     <script src="js/sticky.js"></script>
+    <script src="js/tab-in-text.js"></script>
     <script type="text/javascript" src="js/angular.js"></script>
     <script type="text/javascript" src="app/app.js"></script>
     <script type="text/javascript" src="app/ng-file-input.js"></script>
-    <script type="text/javascript" src="app/lexical.js"></script>
+    <script type="text/javascript" src="app/lexical.service.js"></script>
+    <script type="text/javascript" src="app/lol.controller.js"></script>
 
 </body>
 </html>
