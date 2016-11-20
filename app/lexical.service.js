@@ -30,7 +30,7 @@
 
             // [ GENERAL DELIMITERS ]
             CODE_DELIMITER_START            : /\b(HAI)[\s,]/,
-            CODE_DELIMITER_END              : /\b(KTHXBYE)[\s,]/,
+            CODE_DELIMITER_END              : /\b(KTHXBYE)/,
             STATEMENT_DELIMITER             : /([\n,])$/,
 
             // [ COMMENTS ]
