@@ -88,9 +88,7 @@
         };
 
 
-        function analyze(text) {
-            var tokens = [];
-            var symbols = [];
+        function analyze(text, tokens, symbols) {
             var chars = text.split('');
             var input = '';
             var exec = null;
@@ -531,12 +529,6 @@
                     }
                 }
             }
-
-
-            return {
-                tokens: tokens,
-                symbols: symbols
-            };
 
            function pushToken(lexeme, classification) {
                 console.log('Push token: ' + format(lexeme) + ' : ' +format(classification));

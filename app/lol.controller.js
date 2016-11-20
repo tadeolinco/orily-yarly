@@ -23,9 +23,9 @@
         }
 
         function execute() {
-            var results = lexical.analyze(vm.text);
-            vm.tokens = results.tokens;
-            vm.symbols = results.symbols;
+            vm.tokens = [];
+            vm.symbols = [];
+            lexical.analyze(vm.text, vm.tokens, vm.symbols);
         }
 
         function loadFile() {
