@@ -421,6 +421,17 @@
                 if (exec = (Re.FUNCTION_ARGUMENT_DELIMITER.exec(input))) {
                     checkTrash(input, exec[1]);
                     pushToken(exec[1], 'function argument delimiter');
+                    while (!/[\n,]/.test(chars[i])
+                            && !/\b(.+)[\s,]/.test(input)
+                            && i < chars.length) {
+                        input += chars[++i];
+                        console.log(format(input));
+                    } 
+                    if (exec = (Re.IDENTIFIER.exec(input))) {
+                        pushToken(exec[1], 'variable identifier');
+                        pushSymbol(exec[1], 'NOOB');
+                    }
+                    input = '';
                     i--;
                     continue;
                 }
