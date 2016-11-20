@@ -389,7 +389,7 @@
                     for (symbol of symbols) {
                         if (symbol.identifier === token.lexeme) {
                             if (symbol.type === 'function') {
-                                token.classification = 'function variable';
+                                token.classification = 'function identifier';
                             } else {
                                 token.classification = 'variable identifier';
                             }
