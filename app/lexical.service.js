@@ -29,8 +29,8 @@
             DATA_TYPE                       : /\b(YARN|NUMBR|NUMBAR|TROOF|NOOB)[\s,]/,
 
             // [ GENERAL DELIMITERS ]
-            CODE_DELIMITER_START            : /\b(HAI)/,
-            CODE_DELIMITER_END              : /\b(KTHXBYE)/,
+            CODE_DELIMITER_START            : /\b(HAI)[\s,]/,
+            CODE_DELIMITER_END              : /\b(KTHXBYE)[\s,]/,
             STATEMENT_DELIMITER             : /([\n,])$/,
 
             // [ COMMENTS ]
@@ -446,13 +446,17 @@
 
                 // [ CODE DELIMITER START ]
                 if (exec = (Re.CODE_DELIMITER_START.exec(input))) {
+                    checkTrash(input, exec[1]);
                     pushToken(exec[1], 'code delimiter');
+                    i--;
                     continue;
                 }
 
                 // [ CODE DELIMITER END ]
                 if (exec = (Re.CODE_DELIMITER_END.exec(input))) {
+                    checkTrash(input, exec[1]);
                     pushToken(exec[1], 'code delimiter');
+                    i--;
                     continue;
                 }
 
