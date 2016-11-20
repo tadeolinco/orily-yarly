@@ -59,11 +59,10 @@
 
 
             // OPERATOR
-            BOOLEAN_OPERATOR                : /(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
-            CONCATENATION                   : /(SMOOSH)\s+/,
-            CASTING_IMPLICIT                : /(MAEK)\s+/,
-            CASTING_EXPLICIT                : /(IS NOW A)\s+/,
-            MATH_OPERATOR                   : /(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
+            // BOOLEAN_OPERATOR                : /(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
+            // CONCATENATION                   : /(SMOOSH)\s+/,
+            // CASTING_IMPLICIT                : /(MAEK|IS NOW A)\s+/,
+            // MATH_OPERATOR                   : /(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
             //UNARY_OPERATOR                  : /(NERFIN|UPPIN)\s+/,
 
             // VARIABLE DECLARATION

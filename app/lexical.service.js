@@ -56,9 +56,15 @@
 
             // [ FUNCTIONS ]
             FUNCTION_DELIMITER_START        : /\b(HOW IZ I)[\s,]/,
-            FUCNTION_ARGUMENT_DELIMITER     : /\b(YR)[\s,]/,
+            FUNCTION_ARGUMENT_DELIMITER     : /\b(YR)[\s,]/,
             FUNCTION_DELIMITER_END          : /\b(IF U SAY SO)[\s,]/,
             FUNCTION_CALL                   : /\b(I IZ)[\s,]/,
+
+            // [ OPERATORS ]
+            BOOLEAN_OPERATOR                : /(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
+            CONCATENATION                   : /(SMOOSH)\s+/,
+            CASTING_EXPLICIT                : /(MAEK|IS NOW A)\s+/,
+            MATH_OPERATOR                   : /(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
 
             // [ RETURN OPERATOR ]
             RETURN_OPERATOR                 : /\b(FOUND YR)[\s,]/,
@@ -103,10 +109,59 @@
                     continue;
                 }
 
+                // [ CASTING_EXPLICIT ]
+                if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
+                    checkTrash(input, exec[1]);
+                    pushToken(exec[1], 'explicit casting');
+                    i--;
+                    continue;
+                }
+
                 // [ INITIALIZATION_DELIMITER ]
                 if (exec = (Re.INITIALIZATION_DELIMITER.exec(input))) {
                     checkTrash(input, exec[1]);
                     pushToken(exec[1], 'initialization delimiter');
+                    i--;
+                    continue;
+                }
+
+                // [ CONCATENATION]
+                if (exec = (Re.CONCATENATION.exec(input))) {
+                    checkTrash(input, exec[1]);
+                    pushToken(exec[1], 'concatenation operation');
+                    i--;
+                    continue;
+                }
+
+                // [ BOOLEAN OPERATORS ]
+                if (exec = (Re.BOOLEAN_OPERATOR.exec(input))) {
+                    checkTrash(input, exec[1]);
+                    switch (exec[1]) {
+                        case "BOTH OF"      : pushToken(exec[1], 'AND operation');                break;
+                        case "EITHER OF"    : pushToken(exec[1], 'OR operation');                 break;
+                        case "WON OF"       : pushToken(exec[1], 'XOR operation');                break;
+                        case "NOT"          : pushToken(exec[1], 'unary negation operation');     break;
+                        case "ALL OF"       : pushToken(exec[1], 'infinite arity AND');           break;
+                        case "ANY OF"       : pushToken(exec[1], 'infinite arity OR');            break;
+                        case "BOTH SAEM"    : pushToken(exec[1], 'binary equality operation');    break;
+                        case "DIFFRINT"     : pushToken(exec[1], 'binary inequality operation');  break;
+                    }
+                    i--;
+                    continue;
+                }
+
+                // [ MATHEMATICAL OPERATORS]
+                if (exec = (Re.MATH_OPERATOR.exec(input))) {
+                    checkTrash(input, exec[1]);
+                    switch (exec[1]) {
+                        case "SUM OF"       : pushToken(exec[1], 'addition operation');           break;
+                        case "DIFF OF"      : pushToken(exec[1], 'subtraction operation');        break;
+                        case "PRODUKT OF"   : pushToken(exec[1], 'multiplication operation');     break;
+                        case "QUOSHUNT OF"  : pushToken(exec[1], 'division operation');           break;
+                        case "MOD OF"       : pushToken(exec[1], 'modulo operation');             break;
+                        case "BIGGR OF"     : pushToken(exec[1], 'maximum operation');            break;
+                        case "SMALLR OF"    : pushToken(exec[1], 'minimum operation');            break;
+                    }
                     i--;
                     continue;
                 }
@@ -354,7 +409,7 @@
                 }
 
                 // [ FUNCTION ARGUMENT DELIMITER ]
-                if (exec = (Re.FUCNTION_ARGUMENT_DELIMITER.exec(input))) {
+                if (exec = (Re.FUNCTION_ARGUMENT_DELIMITER.exec(input))) {
                     checkTrash(input, exec[1]);
                     pushToken(exec[1], 'function argument delimiter');
                     i--;
