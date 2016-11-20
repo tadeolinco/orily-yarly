@@ -45,6 +45,15 @@
             // [ BREAK ]
             BREAK_DELIMITER                 : /\b(GTFO)[\s,]/,
 
+			// [CONTROL FLOW ]
+			CONDITIONAL_BLOCK               : /\b(YA RLY|NO WAI|MEBBE)[\s,]/,
+            CONDITIONAL_DELIMITER           : /\b(O RLY\?)[\s,]/,
+            COMPARISON_BLOCK                : /\b(OMG|OMGWTF)[\s,]/,
+
+            CONTROL_FLOW_DELIMITER_END      : /\b(OIC)[\s,]/,
+            SWITCH_DELIMITER                : /\b(WTF\?)[\s,]/,
+			//CONTROL_FLOW_SEPARATOR			: /[,]$/,
+			
             // [ LOOPS ]
             LOOP_DELIMITER_START            : /\b(IM IN YR)[\s,]/,
             LOOP_DELIMITER_END              : /\b(IM OUTTA YR)[\s,]/,
@@ -206,7 +215,46 @@
                     i--;
                     continue;
                 }
-
+				
+				//[CONDITIONAL BLOCK]
+				if(exec=(Re.CONDITIONAL_BLOCK.exec(input))){
+					checkTrash(input,exec[1]);
+					pushToken(exec[1], 'conditional block');
+					i--;
+					continue;
+				}
+				
+				//[CONDITIONAL DELIMITER]
+				if(exec=(Re.CONDITIONAL_DELIMITER.exec(input))){
+					checkTrash(input,exec[1]);
+					pushToken(exec[1], 'conditional delimiter');
+					i--;
+					continue;
+				}
+				//[COMPARISON BLOCK]
+				if(exec=(Re.COMPARISON_BLOCK.exec(input))){
+					checkTrash(input,exec[1]);
+					pushToken(exec[1], 'comparison block');
+					i--;
+					continue;
+				}
+				
+				//[CONTROL FLOW DELIMITER END]
+				if(exec=(Re.CONTROL_FLOW_DELIMITER_END.exec(input))){
+					checkTrash(input,exec[1]);
+					pushToken(exec[1], 'control flow delimiter end');
+					i--;
+					continue;
+				}
+				
+				//[SWITCH DELIMITER]
+				if(exec=(Re.SWITCH_DELIMITER.exec(input))){
+					checkTrash(input,exec[1]);
+					pushToken(exec[1], 'switch delimiter');
+					i--;
+					continue;
+				}
+				
                 // [ LOOP DELIMITER START ]
                 if (exec = (Re.LOOP_DELIMITER_START.exec(input))) {
                     checkTrash(input, exec[1]);
