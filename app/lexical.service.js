@@ -29,7 +29,7 @@
             DATA_TYPE                       : /\b(YARN|NUMBR|NUMBAR|TROOF|NOOB)[\s,]/,
 
             // [ GENERAL DELIMITERS ]
-            CODE_DELIMITER_START            : /\b(HAI)/,
+            CODE_DELIMITER_START            : /\b(HAI)[\s,]/,
             CODE_DELIMITER_END              : /\b(KTHXBYE)/,
             STATEMENT_DELIMITER             : /([\n,])$/,
 
@@ -70,11 +70,11 @@
             FUNCTION_CALL                   : /\b(I IZ)[\s,]/,
 
             // [ OPERATORS ]
-            BOOLEAN_OPERATOR                : /\b(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)\s+/,
-            CONCATENATION                   : /\b(SMOOSH)\s+/,
-            CASTING_EXPLICIT                : /\b(MAEK|IS NOW A)\s+/,
-            MATH_OPERATOR                   : /\b(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
-            INFINITE_ARITY_DELIMITER        : /\b(MKAY)\s+/,
+            BOOLEAN_OPERATOR                : /\b(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)[\s,]/,
+            CONCATENATION                   : /\b(SMOOSH)[\s,]/,
+            CASTING_EXPLICIT                : /\b(MAEK|IS NOW A)[\s,]/,
+            MATH_OPERATOR                   : /\b(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)[\s,]/,
+            INFINITE_ARITY_DELIMITER        : /\b(MKAY)[\s,]/,
 
             // [ RETURN OPERATOR ]
             RETURN_OPERATOR                 : /\b(FOUND YR)[\s,]/,
@@ -494,13 +494,17 @@
 
                 // [ CODE DELIMITER START ]
                 if (exec = (Re.CODE_DELIMITER_START.exec(input))) {
+                    checkTrash(input, exec[1]);
                     pushToken(exec[1], 'code delimiter');
+                    i--;
                     continue;
                 }
 
                 // [ CODE DELIMITER END ]
                 if (exec = (Re.CODE_DELIMITER_END.exec(input))) {
+                    checkTrash(input, exec[1]);
                     pushToken(exec[1], 'code delimiter');
+                    i--;
                     continue;
                 }
 
