@@ -65,6 +65,7 @@
             CONCATENATION                   : /\b(SMOOSH)\s+/,
             CASTING_EXPLICIT                : /\b(MAEK|IS NOW A)\s+/,
             MATH_OPERATOR                   : /\b(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)\s+/,
+            INFINITE_ARITY_DELIMITER        : /\b(MKAY)\s+/,
 
             // [ RETURN OPERATOR ]
             RETURN_OPERATOR                 : /\b(FOUND YR)[\s,]/,
@@ -162,6 +163,14 @@
                         case "BIGGR OF"     : pushToken(exec[1], 'maximum operation');            break;
                         case "SMALLR OF"    : pushToken(exec[1], 'minimum operation');            break;
                     }
+                    i--;
+                    continue;
+                }
+
+                // [ INFINITE ARITY DELIMITER ]
+                if (exec = (Re.INFINITE_ARITY_DELIMITER.exec(input))) {
+                    checkTrash(input, exec[1]);
+                    pushToken(exec[1], 'infinite arity delimiter');
                     i--;
                     continue;
                 }
