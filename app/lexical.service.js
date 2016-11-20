@@ -216,40 +216,40 @@
                     continue;
                 }
 				
-				//[CONDITIONAL BLOCK]
+				// [CONDITIONAL BLOCK]
 				if(exec=(Re.CONDITIONAL_BLOCK.exec(input))){
-					checkTrash(input,exec[1]);
+					checkTrash(exec);
 					pushToken(exec[1], 'conditional block');
 					i--;
 					continue;
 				}
 				
-				//[CONDITIONAL DELIMITER]
+				// [CONDITIONAL DELIMITER]
 				if(exec=(Re.CONDITIONAL_DELIMITER.exec(input))){
-					checkTrash(input,exec[1]);
+					checkTrash(exec);
 					pushToken(exec[1], 'conditional delimiter');
 					i--;
 					continue;
 				}
-				//[COMPARISON BLOCK]
+				// [COMPARISON BLOCK]
 				if(exec=(Re.COMPARISON_BLOCK.exec(input))){
-					checkTrash(input,exec[1]);
+					checkTrash(exec);
 					pushToken(exec[1], 'comparison block');
 					i--;
 					continue;
 				}
 				
-				//[CONTROL FLOW DELIMITER END]
+				// [CONTROL FLOW DELIMITER END]
 				if(exec=(Re.CONTROL_FLOW_DELIMITER_END.exec(input))){
-					checkTrash(input,exec[1]);
+					checkTrash(exec);
 					pushToken(exec[1], 'control flow delimiter end');
 					i--;
 					continue;
 				}
 				
-				//[SWITCH DELIMITER]
+				// [SWITCH DELIMITER]
 				if(exec=(Re.SWITCH_DELIMITER.exec(input))){
-					checkTrash(input,exec[1]);
+					checkTrash(exec);
 					pushToken(exec[1], 'switch delimiter');
 					i--;
 					continue;
