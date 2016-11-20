@@ -78,6 +78,7 @@
             var chars = text.split('');
             var input = '';
             var exec = null;
+            pushSymbol('IT', 'NOOB');
             for (let i = 0; i < chars.length; i++) {
                 input += chars[i];
                 console.log(format(input));
@@ -228,8 +229,10 @@
                         console.log(format(input));
                     }
                     i--;
-                    pushToken(exec[1], 'block comment');
-                    pushToken(exec[2], 'block comment delimiter');
+                    if (exec) {
+                        pushToken(exec[1], 'block comment');
+                        pushToken(exec[2], 'block comment delimiter');
+                    }
                     continue;
 
                 }
@@ -244,7 +247,9 @@
                         console.log(format(input));
                     }
                     i--;
-                    pushToken(exec[1], 'line comment');
+                    if (exec) {
+                        pushToken(exec[1], 'line comment');
+                    }
                     continue;
                 }
 
@@ -286,8 +291,10 @@
                         console.log(format(input));
                     }
                     i--;
-                    pushToken(exec[1], 'string literal');
-                    pushToken(exec[2], 'string delimiter');
+                    if (exec) {
+                        pushToken(exec[1], 'string literal');
+                        pushToken(exec[2], 'string delimiter');
+                    }
                     continue;
                 }
 
