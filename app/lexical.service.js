@@ -92,7 +92,7 @@
 
                 // [ DECLARATION_DELIMITER ]
                 if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'declaration delimiter');
                     i--;
                     while (!/[\n,]/.test(chars[i])
@@ -112,7 +112,7 @@
 
                 // [ CASTING_EXPLICIT ]
                 if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'explicit casting');
                     i--;
                     continue;
@@ -120,7 +120,7 @@
 
                 // [ INITIALIZATION_DELIMITER ]
                 if (exec = (Re.INITIALIZATION_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'initialization delimiter');
                     i--;
                     continue;
@@ -128,7 +128,7 @@
 
                 // [ CONCATENATION]
                 if (exec = (Re.CONCATENATION.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'concatenation operation');
                     i--;
                     continue;
@@ -136,7 +136,7 @@
 
                 // [ BOOLEAN OPERATORS ]
                 if (exec = (Re.BOOLEAN_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     switch (exec[1]) {
                         case "BOTH OF"      : pushToken(exec[1], 'AND operation');                break;
                         case "EITHER OF"    : pushToken(exec[1], 'OR operation');                 break;
@@ -153,7 +153,7 @@
 
                 // [ MATHEMATICAL OPERATORS]
                 if (exec = (Re.MATH_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     switch (exec[1]) {
                         case "SUM OF"       : pushToken(exec[1], 'addition operation');           break;
                         case "DIFF OF"      : pushToken(exec[1], 'subtraction operation');        break;
@@ -169,7 +169,7 @@
 
                 // [ INFINITE ARITY DELIMITER ]
                 if (exec = (Re.INFINITE_ARITY_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'infinite arity delimiter');
                     i--;
                     continue;
@@ -177,7 +177,7 @@
 
                 // [ ASSIGNMENT OPERATOR ]
                 if (exec = (Re.ASSIGNMENT_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'assignment operator');
                     i--;
                     continue;
@@ -185,7 +185,7 @@
 
                 // [ INCREMENT OPERATOR ]
                 if (exec = (Re.INCREMENT_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'increment operator');
                     i--;
                     continue;
@@ -193,7 +193,7 @@
 
                 // [ DECREMENT OPERATOR ]
                 if (exec = (Re.DECREMENT_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'decrement operator');
                     i--;
                     continue;
@@ -201,7 +201,7 @@
 
                 // [ BREAK ]
                 if (exec = (Re.BREAK_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'break delimiter');
                     i--;
                     continue;
@@ -209,7 +209,7 @@
 
                 // [ LOOP DELIMITER START ]
                 if (exec = (Re.LOOP_DELIMITER_START.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'loop delimiter start');
                     i--;
                     while (!/[\n,]/.test(chars[i])
@@ -228,7 +228,7 @@
 
                 // [ LOOP CONDITION ]
                 if (exec = (Re.LOOP_CONDITION.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'loop condition');
                     i--;
                     continue;
@@ -236,7 +236,7 @@
 
                 // [ LOOP DELIMITER END ]
                 if (exec = (Re.LOOP_DELIMITER_END.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'loop delimiter end');
                     i--;
                     while (!/[\n,]/.test(chars[i])
@@ -256,7 +256,7 @@
 
                 // [ DATA TYPES ]
                 if (exec = (Re.DATA_TYPE.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     switch (exec[1]) {
                         case "YARN"     : pushToken(exec[1], 'string data type');           break;
                         case "NUMBR"    : pushToken(exec[1], 'integer data type');          break;
@@ -270,7 +270,7 @@
 
                 // [ INPUT ]
                 if (exec = (Re.INPUT.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'input delimiter');
                     i--;
                     continue;
@@ -278,7 +278,7 @@
 
                 // [ OUTPUT ]
                 if (exec = (Re.OUTPUT.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'output delimiter');
                     i--;
                     continue;
@@ -286,7 +286,7 @@
 
                 // [ BLOCK COMMENT ]
                 if (exec = (Re.BLOCK_COMMENT_DELIMITER_START.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'block comment delimiter');
                     while(!(exec = (Re.BLOCK_COMMENT_DELIMITER_END.exec(input))) && i < chars.length) {
                         input += chars[++i];
@@ -304,7 +304,7 @@
 
                 // [ LINE COMMENT ]
                 if (exec = (Re.LINE_COMMENT_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'line comment delimiter');
                     while (!(exec = (/(.*)\n/).exec(input)) && i < chars.length) {
                         input += chars[++i];
@@ -319,7 +319,7 @@
 
                 // [ BOOLEAN ]
                 if (exec = (Re.BOOLEAN.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'boolean literal');
                     i--;
                     continue;
@@ -334,13 +334,13 @@
                     i--;
                     // [ FLOAT ]
                     if (exec = (Re.FLOAT.exec(input))) {
-                        checkTrash(input, exec[1]);
+                        checkTrash(exec);
                         pushToken(exec[1], 'floating-point literal');
                         continue;
                     }
 
                     if (exec = (Re.INTEGER.exec(input))) {
-                        checkTrash(input, exec[1]);
+                        checkTrash(exec);
                         pushToken(exec[1], 'integer literal');
                         continue;
                     }
@@ -348,7 +348,7 @@
 
                 // [ STRING ]
                 if (exec = (Re.STRING_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'string delimiter');
                     while (!(exec = (/(.*)(")[\s,]/.exec(input))) && i < chars.length) {
                         input += chars[++i]; 
@@ -364,7 +364,7 @@
 
                 // [ PAREMTER DELIMITER ]
                 if (exec = (Re.PARAMETER_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'parameter delimiter');
                     i--;
                     continue;
@@ -372,7 +372,7 @@
 
                 // [ FUNCTION CALL ]
                 if (exec = (Re.FUNCTION_CALL.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'function call delimiter');
                     i--;
                     while (!/[\n,]/.test(chars[i])
@@ -391,7 +391,7 @@
 
                 // [ RETURN OPERATOR ]
                 if (exec = (Re.RETURN_OPERATOR.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'return operator');
                     i--;
                     continue;
@@ -399,7 +399,7 @@
 
                 // [ FUNCTION DELIMITER START ]
                 if (exec = (Re.FUNCTION_DELIMITER_START.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'function delimiter start');
                     i--;
                     while (!/[\n,]/.test(chars[i])
@@ -419,7 +419,7 @@
 
                 // [ FUNCTION ARGUMENT DELIMITER ]
                 if (exec = (Re.FUNCTION_ARGUMENT_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'function argument delimiter');
                     while (!/[\n,]/.test(chars[i])
                             && !/\b(.+)[\s,]/.test(input)
@@ -438,7 +438,7 @@
 
                 // [ FUNCTION DELIMITER END ]
                 if (exec = (Re.FUNCTION_DELIMITER_END.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'function delimiter end');
                     i--;
                     continue;
@@ -446,7 +446,7 @@
 
                 // [ CODE DELIMITER START ]
                 if (exec = (Re.CODE_DELIMITER_START.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'code delimiter');
                     i--;
                     continue;
@@ -454,7 +454,7 @@
 
                 // [ CODE DELIMITER END ]
                 if (exec = (Re.CODE_DELIMITER_END.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'code delimiter');
                     i--;
                     continue;
@@ -462,7 +462,7 @@
 
                 // [ STATEMENT DELIMITER ]
                 if (exec = (Re.STATEMENT_DELIMITER.exec(input))) {
-                    checkTrash(input, exec[1]);
+                    checkTrash(exec);
                     pushToken(exec[1], 'statement delimiter');
                     continue;
                 }
@@ -508,8 +508,8 @@
                 });
             }
 
-            function checkTrash(input, exec) {
-                var darest = input.substr(0, input.search(exec));
+            function checkTrash(exec) {
+                var darest = exec.input.substring(0, exec.input.length-exec[0].length);
                 var strings = darest.split(/\s+/);
                 for (string of strings) {
                     if (!/^\s*$/.test(string)) {
