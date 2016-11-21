@@ -1,7 +1,7 @@
 (function() {
     angular
         .module('app')
-        factory('syntax', syntax);
+        .factory('syntax', syntax);
 
     function syntax() {
 
