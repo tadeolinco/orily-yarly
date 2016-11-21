@@ -1,10 +1,10 @@
 (function() {
     angular
         .module('app')
-        .factory('lexical', lexical);
+        .factory('lexer', lexer);
 
 
-    function lexical() {
+    function lexer() {
         const Re = {
             // [ LITERALS ]
             STRING_DELIMITER                : /(")/,
@@ -515,20 +515,6 @@
             }
 
 
-            // [ CHECKS FOR KNOWN VARIABLES ]
-            for (token of tokens) {
-                if (token.classification === 'UNEXPECTED') {
-                    for (symbol of symbols) {
-                        if (symbol.identifier === token.lexeme) {
-                            if (symbol.type === 'function') {
-                                token.classification = 'function identifier';
-                            } else {
-                                token.classification = 'variable identifier';
-                            }
-                        }
-                    }
-                }
-            }
 
            function pushToken(lexeme, classification) {
                 console.log('Push token: ' + format(lexeme) + ' : ' +format(classification));

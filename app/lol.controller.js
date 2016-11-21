@@ -3,7 +3,7 @@
         .module('app')
         .controller('lolController', lolController);
 
-    function lolController($scope, lexical, syntax) {
+    function lolController($scope, lexer, parser) {
         var vm = this;
 
         vm.file = null;
@@ -25,7 +25,8 @@
         function execute() {
             vm.tokens = [];
             vm.symbols = [];
-            lexical.analyze(vm.text, vm.tokens, vm.symbols);
+            lexer.analyze(vm.text, vm.tokens, vm.symbols);
+            parser.analyze(vm.tokens, vm.symbols);
             console.log(vm.tokens);
             console.log(vm.symbols);
         }
