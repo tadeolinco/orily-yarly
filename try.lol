@@ -1,3 +1,3 @@
 HAI 1.2
-    SMOOSH MKAY
+
 KTHXBYE
