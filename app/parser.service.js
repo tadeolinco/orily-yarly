@@ -12,7 +12,12 @@
         };
 
         function analyze(tokens, symbols) {
-            
+            updateVariables(tokens, symbols);
+                       
+        }
+        
+
+        function updateVariables(tokens, symbols) {
             for (symbol of symbols) {
                 var found = false;
                 for (let i=tokens.length-1; i>=0; i--) {
@@ -38,11 +43,7 @@
                     if (found) break;
                 }
             }
-
-            
         }
-    
-
     }
 
 })();

@@ -46,7 +46,7 @@
             BREAK_DELIMITER                 : /\b(GTFO)[\s,]/,
 
 			// [CONTROL FLOW ]
-			CONDITIONAL_BLOCK               : /\b(YA RLY|NO WAI|MEBBE)[\s,]/,
+			CONDITIONAL_BLOCK               : /\b(YA RLY|NO WAI|MEBBE)[\s,]/, // CHANGE ME
             CONDITIONAL_DELIMITER           : /\b(O RLY\?)[\s,]/,
             COMPARISON_BLOCK                : /\b(OMG|OMGWTF)[\s,]/,
 
