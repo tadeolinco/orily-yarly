@@ -54,10 +54,13 @@
                 if (token.classification != 'statement delimiter')
                     line.push(token);
                 else {
-                    console.log(line);
                     console.log(statementLegality(line));
                     line = []; 
                 }
+            }
+            if (line.length) {
+                console.log(statementLegality(line));
+                line = []; 
             }
         }
 
@@ -125,7 +128,17 @@
 
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
-            var i = 0;
+            /* HAI */
+            length = 0;
+            if (expect('code delimiter start', line)) {
+                return true;
+            }
+
+            length = 0;
+            /* KTHXBYE */
+            if (expect('code delimiter end', line)) {
+                return true;
+            }
 
             /* VISIBLE */
             length = 0;
