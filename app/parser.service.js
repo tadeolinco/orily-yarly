@@ -60,7 +60,6 @@
                 }
             }
         }
-        
 
         /* Checks if type meets expectations */
         function expect(expected, line){
@@ -74,15 +73,16 @@
             } 
         }
 
+
         function expression(line){
             console.log(length+'[checking] expression');
-            if (literal(line))               return true;
+            if (literal(line))                         return true;
             //if (concatenation(line))         return true;
             //if (functionCall(line))          return true;
-            //if (variable(line))              return true;
             //if (conditionalExpression(line)) return true;
             if (arithmeticExpression(line))   return true;
             //if (castingOperator(line))       return true;
+            if (expect('variable identifier', line))     return true;
             return false; 
         }
 
@@ -125,18 +125,46 @@
 
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
+            var i = 0;
+
+            /* VISIBLE */
             length = 0;
-            if (expect('input delimiter',line)){
+            if (expect('output delimiter',line)){
                 expression(line);
                 return true;
             }
 
+            /* GIMMEH */
+            length = 0;
+            if (expect('input delimiter', line)){
+                if (expect('variable identifier', line))
+                    return true;
+                else 
+                    return false;
+            }
+
+            /* VARIABLE DECLARATION */
+            length = 0;
+            if (expect('declaration delimiter', line)){
+                if (expect('variable identifier', line)){
+                    if (expect('initialization delimiter', line)){
+                        if (expression(line)) return true;
+                        else return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            /* Checks if expression */
             length = 0;
             if (expression(line)) {
                 return true;
             }
 
+            /* Line does not meet anything */
             return false;
+  
         }
     }
 })();
