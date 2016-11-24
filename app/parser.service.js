@@ -13,7 +13,7 @@
 
         function analyze(tokens, symbols) {
             updateVariables(tokens, symbols);
-                       
+            var t = tokens.slice(0);
         }
         
 
@@ -45,8 +45,6 @@
                 }
             }
         }
-
-        
         
         function literal(line, i) { // i = 1;
             if (string(line, i))                            return true;
@@ -62,6 +60,43 @@
             && expect('string delimiter', line[i+2])) return true;
             return false;
         }
-    }
 
+        function arithmeticOperation(line, i) {
+            if (expression(line, i+1))
+        }
+
+        /* Checks if type meets expectations */
+        function expect(expected, token){
+            if (expected == token.classification)
+                return true; 
+            else 
+                return false;
+        }
+
+        function expression(line, i){
+            if (literal(line, i))               return true;
+            if (concatenation(line, i))         return true;
+            if (functionCall(line, i))          return true;
+            if (variable(line, i))              return true;
+            if (conditionalExpression(line, i)) return true;
+            if (arithmeticOperation(line, i))   return true;
+            if (castingOperator(line, i))       return true;
+            return false; 
+        }
+
+        /* Iterates throughout statement array and checks legality */
+        function statementLegality(line){
+            var i = 0;
+
+            if (expect('input delimiter',line[i])){
+                expression(line, i+1);
+                return true;
+            }
+
+
+            else {
+                return false;
+            }
+        }
+    }
 })();
