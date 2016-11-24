@@ -81,7 +81,7 @@
             //if (functionCall(line))          return true;
             //if (variable(line))              return true;
             //if (conditionalExpression(line)) return true;
-            if (arithmeticOperation(line))   return true;
+            if (arithmeticExpression(line))   return true;
             //if (castingOperator(line))       return true;
             return false; 
         }
@@ -102,8 +102,8 @@
             return false;
         }
 
-        function arithmeticOperation(line) {
-            console.log(length+'[checking] arithmeticOperation');
+        function arithmeticExpression(line) {
+            console.log(length+'[checking] arithmeticExpression');
             if (mathOperation(line)
             && expression(line)
             && expect('parameter delimiter', line)
