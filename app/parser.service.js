@@ -21,7 +21,8 @@
             for (symbol of symbols) {
                 var found = false;
                 for (let i=tokens.length-1; i>=0; i--) {
-                    if (tokens[i].classification === 'declaration delimiter' 
+                    if ((tokens[i].classification === 'declaration delimiter'
+                    || tokens[i].classification === 'function delimiter start') 
                     && tokens[i+1]
                     && tokens[i+1].lexeme === symbol.identifier) {
                         i++;
@@ -43,6 +44,23 @@
                     if (found) break;
                 }
             }
+        }
+
+        
+        
+        function literal(line, i) { // i = 1;
+            if (string(line, i))                            return true;
+            if (expect('boolean literal', line[i]))         return true;
+            if (expect('floating-point literal', line[i]))  return true;
+            if (expect('integer literal'))                  return true;
+            return false;
+        }
+
+        function string(line ,i) {
+            if (expect('string delimiter', line[i])
+            && expect('string literal', line[i+1])
+            && expect('string delimiter', line[i+2])) return true;
+            return false;
         }
     }
 
