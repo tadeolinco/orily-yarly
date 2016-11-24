@@ -38,10 +38,22 @@
                     if (found) break;
                 }
             }
-
+            parseLine(tokens);
             
         }
     
+        function parseLine(tokens){
+            line=[];
+            for(token of tokens){
+                if(token.classification != 'statement delimiter')
+                    line.push(token);
+                else{
+                    console.log(line);
+                    //Line analyzer here
+                    line=[]; 
+                }
+            }
+        }
 
     }
 
