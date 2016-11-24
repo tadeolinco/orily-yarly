@@ -54,29 +54,57 @@
         }
 
         function expression(line, i){
-            if (literal(line, i))               return true;
-            if (concatenation(line, i))         return true;
-            if (functionCall(line, i))          return true;
-            if (variable(line, i))              return true;
-            if (conditionalExpression(line, i)) return true;
-            if (arithmeticOperation(line, i))   return true;
-            if (castingOperator(line, i))       return true;
+            if (literal(line, i))                    return true;
+            if (concatenation(line, i))              return true;
+            if (functionCall(line, i))               return true;
+            if (conditionalExpression(line, i))      return true;
+            if (arithmeticOperation(line, i))        return true;
+            if (castingOperator(line, i))            return true;
+            if (expect('variable identifier', i))    return true;
             return false; 
+        }
+
+        function conditionalExpression(line, i){
+
         }
 
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
             var i = 0;
 
-            if (expect('input delimiter',line[i])){
+            /* VISIBLE */
+            if (expect('output delimiter',line[i])){
                 expression(line, i+1);
                 return true;
             }
 
+            /* GIMMEH */
+            if (expect('input delimiter', line[i])){
+                if (expect('variable identifier', line[i+1]))
+                    return true;
+                else 
+                    return false;
+            }
 
-            else {
+            /* VARIABLE DECLARATION */
+            if (expect('declaration delimiter', line[i])){
+                if (expect('variable identifier', line[i+1])){
+                    if (expect('initialization delimiter', line[i+2])){
+                        if (expression(line, i+3)) return true;
+                        else return false;
+                    }
+                    return true;
+                }
                 return false;
             }
+
+            /* Checks if expression */
+            if (expression(line, i)){
+                return true;
+            }
+
+            /* Line does not meet anything */
+            return false;
         }
     }
 
