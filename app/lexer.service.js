@@ -46,14 +46,17 @@
             BREAK_DELIMITER                 : /\b(GTFO)[\s,]/,
 
 			// [CONTROL FLOW ]
-			CONDITIONAL_BLOCK               : /\b(YA RLY|NO WAI|MEBBE)[\s,]/,
-            CONDITIONAL_DELIMITER           : /\b(O RLY\?)[\s,]/,
-            COMPARISON_BLOCK                : /\b(OMG|OMGWTF)[\s,]/,
+            CONDITIONAL_DELIMITER_START     : /\b(O RLY\?)[\s,]/,
+			CONDITIONAL_IF_DELIMITER        : /\b(YA RLY)[\s,]/,
+            CONDITIONAL_ELSE_IF_DELIMITER   : /\b(MEBBE)[\s,]/,
+            CONDITIONAL_ELSE_DELIMITER      : /\b(NO WAI)[\s,]/,
 
-            CONTROL_FLOW_DELIMITER_END      : /\b(OIC)[\s,]/,
             SWITCH_DELIMITER                : /\b(WTF\?)[\s,]/,
-			//CONTROL_FLOW_SEPARATOR			: /[,]$/,
+            CASE_DELIMITER                  : /\b(OMG)[\s,]/,
+            DEFAULT_CASE_DELIMITER          : /\b(OMGWTF)[\s,]/,
 			
+            CONDITIONAL_DELIMITER_END      : /\b(OIC)[\s,]/,
+            
             // [ LOOPS ]
             LOOP_DELIMITER_START            : /\b(IM IN YR)[\s,]/,
             LOOP_DELIMITER_END              : /\b(IM OUTTA YR)[\s,]/,
@@ -72,7 +75,8 @@
             // [ OPERATORS ]
             BOOLEAN_OPERATOR                : /\b(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)[\s,]/,
             CONCATENATION                   : /\b(SMOOSH)[\s,]/,
-            CASTING_EXPLICIT                : /\b(MAEK|IS NOW A)[\s,]/,
+            CASTING                         : /\b(MAEK|IS NOW A)[\s,]/,
+            CASTING_SEPARATOR               : /\b(A)[\s,]/,
             MATH_OPERATOR                   : /\b(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)[\s,]/,
             INFINITE_ARITY_DELIMITER        : /\b(MKAY)[\s,]/,
 
@@ -117,10 +121,21 @@
                     continue;
                 }
 
-                // [ CASTING_EXPLICIT ]
-                if (exec = (Re.CASTING_EXPLICIT.exec(input))) {
+                // [ CASTING ]
+                if (exec = (Re.CASTING.exec(input))) {
                     checkTrash(exec);
-                    pushToken(exec[1], 'explicit casting');
+                    switch (exec[1]) {
+                        case "MAEK"     : pushToken(exec[1], 'casting operator');               break;
+                        case "IS NOW A" : pushToken(exec[1], 'casting assigment delimiter');    break;
+                    }
+                    i--;
+                    continue;
+                }
+
+                // [ CASTING SEPARATOR ]
+                if (exec = (Re.CASTING_SEPARATOR.exec(input))) {
+                    checkTrash(exec);
+                    pushToken(exec[1], 'casting separator');
                     i--;
                     continue;
                 }
@@ -214,38 +229,63 @@
                     continue;
                 }
 				
-				// [CONDITIONAL BLOCK]
-				if(exec=(Re.CONDITIONAL_BLOCK.exec(input))){
+				// [ CONDITIONAL IF DELIMITER ]
+				if(exec=(Re.CONDITIONAL_IF_DELIMITER.exec(input))){
 					checkTrash(exec);
-					pushToken(exec[1], 'conditional block');
+					pushToken(exec[1], 'conditional if delimiter');
 					i--;
 					continue;
 				}
 				
-				// [CONDITIONAL DELIMITER]
-				if(exec=(Re.CONDITIONAL_DELIMITER.exec(input))){
+                // [ CONDITIONAL ELSE IF DELIMITER ]
+				if(exec=(Re.CONDITIONAL_ELSE_IF_DELIMITER.exec(input))){
+					checkTrash(exec);
+					pushToken(exec[1], 'conditional else if delimiter');
+					i--;
+					continue;
+				}
+
+                // [ CONDITIONAL ELSE DELIMITER ]
+				if(exec=(Re.CONDITIONAL_ELSE_DELIMITER.exec(input))){
+					checkTrash(exec);
+					pushToken(exec[1], 'conditional else delimiter');
+					i--;
+					continue;
+				}
+
+				// [ CONDITIONAL DELIMITER ]
+				if(exec=(Re.CONDITIONAL_DELIMITER_START.exec(input))){
 					checkTrash(exec);
 					pushToken(exec[1], 'conditional delimiter');
 					i--;
 					continue;
 				}
-				// [COMPARISON BLOCK]
-				if(exec=(Re.COMPARISON_BLOCK.exec(input))){
+
+				// [ CASE DELIMITER ]
+				if(exec=(Re.CASE_DELIMITER.exec(input))){
 					checkTrash(exec);
-					pushToken(exec[1], 'comparison block');
+					pushToken(exec[1], 'case delimiter');
+					i--;
+					continue;
+				}
+
+                // [ DEFAULT_CASE_DELIMITER ]
+				if(exec=(Re.DEFAULT_CASE_DELIMITER.exec(input))){
+					checkTrash(exec);
+					pushToken(exec[1], 'default case delimiter');
 					i--;
 					continue;
 				}
 				
-				// [CONTROL FLOW DELIMITER END]
-				if(exec=(Re.CONTROL_FLOW_DELIMITER_END.exec(input))){
+				// [ CONDITONAL DELIMITER END ]
+				if(exec=(Re.CONDITIONAL_DELIMITER_END.exec(input))){
 					checkTrash(exec);
-					pushToken(exec[1], 'control flow delimiter end');
+					pushToken(exec[1], 'conditional delimiter end');
 					i--;
 					continue;
 				}
 				
-				// [SWITCH DELIMITER]
+				// [ SWITCH DELIMITER ]
 				if(exec=(Re.SWITCH_DELIMITER.exec(input))){
 					checkTrash(exec);
 					pushToken(exec[1], 'switch delimiter');
