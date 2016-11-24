@@ -4,7 +4,7 @@
         .factory('parser', parser);
 
     function parser() {
-
+        var length=0;
 
 
         return service = {
@@ -13,7 +13,8 @@
 
         function analyze(tokens, symbols) {
             updateVariables(tokens, symbols);
-                       
+            var t = tokens.slice(0);
+            parseLine(tokens);           
         }
         
 
@@ -21,7 +22,8 @@
             for (symbol of symbols) {
                 var found = false;
                 for (let i=tokens.length-1; i>=0; i--) {
-                    if (tokens[i].classification === 'declaration delimiter' 
+                    if ((tokens[i].classification === 'declaration delimiter'
+                    || tokens[i].classification === 'function delimiter start') 
                     && tokens[i+1]
                     && tokens[i+1].lexeme === symbol.identifier) {
                         i++;
@@ -43,29 +45,82 @@
                     if (found) break;
                 }
             }
+           
+        }
+    
+        function parseLine(tokens){
+            var line = [];
+            for (token of tokens){
+                if (token.classification != 'statement delimiter')
+                    line.push(token);
+                else {
+                    console.log(line);
+                    console.log(statementLegality(line));
+                    line = []; 
+                }
+            }
         }
 
         /* Checks if type meets expectations */
-        function expect(expected, token){
-            if (expected == token.classification)
+        function expect(expected, line){
+            if (length === line.length) return false;
+            if (expected == line[length].classification) {
+                console.log('[GOT] '+line[length].classification);
+                length++;
                 return true; 
-            else 
+            } else {
                 return false;
+            } 
         }
 
-        function expression(line, i){
-            if (literal(line, i))                    return true;
-            if (concatenation(line, i))              return true;
-            if (functionCall(line, i))               return true;
-            if (conditionalExpression(line, i))      return true;
-            if (arithmeticOperation(line, i))        return true;
-            if (castingOperator(line, i))            return true;
-            if (expect('variable identifier', i))    return true;
+
+        function expression(line){
+            console.log(length+'[checking] expression');
+            if (literal(line))                         return true;
+            //if (concatenation(line))         return true;
+            //if (functionCall(line))          return true;
+            //if (conditionalExpression(line)) return true;
+            if (arithmeticOperation(line))             return true;
+            //if (castingOperator(line))       return true;
+            if expect('variable identifier', line)     return true;
             return false; 
         }
 
-        function conditionalExpression(line, i){
+        function literal(line) { // i = 1;
+            console.log(length+'[checking] literal');
+            if (string(line))                               return true;
+            if (expect('boolean literal', line))            return true;
+            if (expect('floating-point literal', line))     return true;
+            if (expect('integer literal', line))            return true;
+            return false;
+        }
 
+        function string(line) {
+            if (expect('string delimiter', line)
+            && expect('string literal', line)
+            && expect('string delimiter', line)) return true;
+            return false;
+        }
+
+        function arithmeticOperation(line) {
+            console.log(length+'[checking] arithmeticOperation');
+            if (mathOperation(line)
+            && expression(line)
+            && expect('parameter delimiter', line)
+            && expression(line)) return true;
+            return false;
+        }
+
+        function mathOperation(line) {
+            console.log(length+'[checking] mathOperation');
+            if (expect('addition operation', line)) return true;
+            if (expect('subtraction operation', line)) return true;
+            if (expect('multiplication operation', line)) return true;
+            if (expect('division operation', line)) return true;
+            if (expect('modulo operation', line)) return true;
+            if (expect('maximum operation', line)) return true;
+            if (expect('minimum operation', line)) return true;
+            return false;
         }
 
         /* Iterates throughout statement array and checks legality */
@@ -73,24 +128,27 @@
             var i = 0;
 
             /* VISIBLE */
-            if (expect('output delimiter',line[i])){
-                expression(line, i+1);
+            length = 0;
+            if (expect('output delimiter',line)){
+                expression(line);
                 return true;
             }
 
             /* GIMMEH */
-            if (expect('input delimiter', line[i])){
-                if (expect('variable identifier', line[i+1]))
+            length = 0;
+            if (expect('input delimiter', line)){
+                if (expect('variable identifier', line))
                     return true;
                 else 
                     return false;
             }
 
             /* VARIABLE DECLARATION */
-            if (expect('declaration delimiter', line[i])){
-                if (expect('variable identifier', line[i+1])){
-                    if (expect('initialization delimiter', line[i+2])){
-                        if (expression(line, i+3)) return true;
+            length = 0;
+            if (expect('declaration delimiter', line)){
+                if (expect('variable identifier', line)){
+                    if (expect('initialization delimiter', line)){
+                        if (expression(line)) return true;
                         else return false;
                     }
                     return true;
@@ -99,13 +157,14 @@
             }
 
             /* Checks if expression */
-            if (expression(line, i)){
+            length = 0;
+            if (expression(line)) {
                 return true;
             }
 
             /* Line does not meet anything */
             return false;
+  
         }
     }
-
 })();
