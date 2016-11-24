@@ -4,7 +4,7 @@
         .factory('parser', parser);
 
     function parser() {
-
+        var length=0;
 
 
         return service = {
@@ -14,6 +14,7 @@
         function analyze(tokens, symbols) {
             updateVariables(tokens, symbols);
             var t = tokens.slice(0);
+            parseLine(tokens);           
         }
         
 
@@ -44,59 +45,98 @@
                     if (found) break;
                 }
             }
+           
+        }
+    
+        function parseLine(tokens){
+            var line = [];
+            for (token of tokens){
+                if (token.classification != 'statement delimiter')
+                    line.push(token);
+                else {
+                    console.log(line);
+                    console.log(statementLegality(line));
+                    line = []; 
+                }
+            }
         }
         
-        function literal(line, i) { // i = 1;
-            if (string(line, i))                            return true;
-            if (expect('boolean literal', line[i]))         return true;
-            if (expect('floating-point literal', line[i]))  return true;
-            if (expect('integer literal'))                  return true;
-            return false;
-        }
-
-        function string(line ,i) {
-            if (expect('string delimiter', line[i])
-            && expect('string literal', line[i+1])
-            && expect('string delimiter', line[i+2])) return true;
-            return false;
-        }
-
-        function arithmeticOperation(line, i) {
-            if (expression(line, i+1))
-        }
 
         /* Checks if type meets expectations */
-        function expect(expected, token){
-            if (expected == token.classification)
+        function expect(expected, line){
+            if (length === line.length) return false;
+            if (expected == line[length].classification) {
+                console.log('[GOT] '+line[length].classification);
+                length++;
                 return true; 
-            else 
+            } else {
                 return false;
+            } 
         }
 
-        function expression(line, i){
-            if (literal(line, i))               return true;
-            if (concatenation(line, i))         return true;
-            if (functionCall(line, i))          return true;
-            if (variable(line, i))              return true;
-            if (conditionalExpression(line, i)) return true;
-            if (arithmeticOperation(line, i))   return true;
-            if (castingOperator(line, i))       return true;
+        function expression(line){
+            console.log(length+'[checking] expression');
+            if (literal(line))               return true;
+            //if (concatenation(line))         return true;
+            //if (functionCall(line))          return true;
+            //if (variable(line))              return true;
+            //if (conditionalExpression(line)) return true;
+            if (arithmeticOperation(line))   return true;
+            //if (castingOperator(line))       return true;
             return false; 
+        }
+
+        function literal(line) { // i = 1;
+            console.log(length+'[checking] literal');
+            if (string(line))                               return true;
+            if (expect('boolean literal', line))            return true;
+            if (expect('floating-point literal', line))     return true;
+            if (expect('integer literal', line))            return true;
+            return false;
+        }
+
+        function string(line) {
+            if (expect('string delimiter', line)
+            && expect('string literal', line)
+            && expect('string delimiter', line)) return true;
+            return false;
+        }
+
+        function arithmeticOperation(line) {
+            console.log(length+'[checking] arithmeticOperation');
+            if (mathOperation(line)
+            && expression(line)
+            && expect('parameter delimiter', line)
+            && expression(line)) return true;
+            return false;
+        }
+
+        function mathOperation(line) {
+            console.log(length+'[checking] mathOperation');
+            if (expect('addition operation', line)) return true;
+            if (expect('subtraction operation', line)) return true;
+            if (expect('multiplication operation', line)) return true;
+            if (expect('division operation', line)) return true;
+            if (expect('modulo operation', line)) return true;
+            if (expect('maximum operation', line)) return true;
+            if (expect('minimum operation', line)) return true;
+            return false;
         }
 
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
-            var i = 0;
-
-            if (expect('input delimiter',line[i])){
-                expression(line, i+1);
+            length = 0;
+            if (expect('input delimiter',line)){
+                expression(line);
                 return true;
             }
 
-
-            else {
-                return false;
+            length = 0;
+            if (expression(line)) {
+                return true;
             }
+
+            return false;
         }
     }
 })();
