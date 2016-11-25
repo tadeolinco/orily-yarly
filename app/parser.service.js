@@ -11,9 +11,9 @@
             analyze: analyze
         };
 
-        function analyze(tokens, symbols, terminal) {
+        function analyze(tokens, symbols, terminal, input) {
             updateVariables(tokens, symbols);
-            parseLine(tokens, terminal, symbols);           
+            parseLine(tokens, terminal, symbols, input);           
         }
 
         function updateVariables(tokens, symbols) {
@@ -46,20 +46,20 @@
            
         }
     
-        function parseLine(tokens, terminal, symbols){
+        function parseLine(tokens, terminal, symbols, input){
             var line = [];
             for (token of tokens){
                 if (token.classification != 'statement delimiter')
                     line.push(token);
                 else {
                     console.log(statementLegality(line));
-                    semantic.analyze(line, terminal, symbols);
+                    semantic.analyze(line, terminal, symbols, input);
                     line = []; 
                 }
             }
             if (line.length) {
                 console.log(statementLegality(line));
-                semantic.analyze(line, terminal, symbols);
+                semantic.analyze(line, terminal, symbols, input);
                 line = []; 
             }
         }
@@ -134,8 +134,8 @@
                 return true;
             }
 
-            length = 0;
             /* KTHXBYE */
+            length = 0;
             if (expect('code delimiter end', line)) {
                 return true;
             }

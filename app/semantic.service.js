@@ -11,7 +11,7 @@
             analyze: analyze
         };
 
-        function analyze(line, terminal, symbols) {
+        function analyze(line, terminal, symbols, input) {
             if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
                     for (symbol of symbols) {
@@ -19,6 +19,15 @@
                             symbol.value = evaluateMath(line.slice(3));
                             break;
                         }
+                    }
+                }
+            }
+            if (line[0].classification === 'input delimiter') {
+                for (symbol of symbols) {
+                    if (symbol.identifier === line[1].lexeme) {
+                        input.flag = true;
+                        symbol.value = input.value;                        
+                        break;
                     }
                 }
             }
@@ -84,6 +93,10 @@
                 }
             } 
             return stack.pop().lexeme;
+        }
+
+        function input(tokens) {
+
         }
 
     }
