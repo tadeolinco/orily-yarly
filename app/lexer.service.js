@@ -99,7 +99,7 @@
             pushSymbol('IT', 'NOOB');
             for (let i = 0; i < chars.length; i++) {
                 input += chars[i];
-                console.log(format(input));
+                //console.log(format(input));
 
                 // [ DECLARATION_DELIMITER ]
                 if (exec = (Re.DECLARATION_DELIMITER.exec(input))) {
@@ -110,7 +110,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'variable identifier');
@@ -302,7 +302,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'loop identifier');
@@ -329,7 +329,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'loop identifier');
@@ -376,7 +376,7 @@
                     pushToken(exec[1], 'block comment delimiter');
                     while(!(exec = (Re.BLOCK_COMMENT_DELIMITER_END.exec(input))) && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     }
                     i--;
                     if (exec) {
@@ -394,7 +394,7 @@
                     pushToken(exec[1], 'line comment delimiter');
                     while (!(exec = (/(.*)\n/).exec(input)) && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     }
                     i--;
                     if (exec) {
@@ -415,7 +415,7 @@
                 if (exec = (Re.NUMBER_START.exec(input))) {
                     while (!/[\s,]/.test(chars[++i]) && i < chars.length) {
                         input += chars[i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     }
                     i--;
                     // [ FLOAT ]
@@ -438,7 +438,7 @@
                     pushToken(exec[1], 'string delimiter');
                     while (!(exec = (/(.*)(")[\s,]/.exec(input))) && i < chars.length) {
                         input += chars[++i]; 
-                        console.log(format(input));
+                        //console.log(format(input));
                     }
                     i--;
                     if (exec) {
@@ -465,7 +465,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'function identifier');
@@ -492,7 +492,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'function identifier');
@@ -511,7 +511,7 @@
                             && !/\b(.+)[\s,]/.test(input)
                             && i < chars.length) {
                         input += chars[++i];
-                        console.log(format(input));
+                        //console.log(format(input));
                     } 
                     if (exec = (Re.IDENTIFIER.exec(input))) {
                         pushToken(exec[1], 'variable identifier');
@@ -533,7 +533,7 @@
                 // [ CODE DELIMITER START ]
                 if (exec = (Re.CODE_DELIMITER_START.exec(input))) {
                     checkTrash(exec);
-                    pushToken(exec[1], 'code delimiter');
+                    pushToken(exec[1], 'code delimiter start');
                     i--;
                     continue;
                 }
@@ -541,7 +541,7 @@
                 // [ CODE DELIMITER END ]
                 if (exec = (Re.CODE_DELIMITER_END.exec(input))) {
                     checkTrash(exec);
-                    pushToken(exec[1], 'code delimiter');
+                    pushToken(exec[1], 'code delimiter end');
                     i--;
                     continue;
                 }
@@ -557,7 +557,7 @@
 
 
            function pushToken(lexeme, classification) {
-                console.log('Push token: ' + format(lexeme) + ' : ' +format(classification));
+                //console.log('Push token: ' + format(lexeme) + ' : ' +format(classification));
                 tokens.push({
                     lexeme          : lexeme,
                     classification  : classification
@@ -566,7 +566,7 @@
             }
 
             function pushSymbol(identifier, type) {
-                console.log('Push symbol: '+format(identifier) + ' : ' + format(type));
+                //console.log('Push symbol: '+format(identifier) + ' : ' + format(type));
                 symbols.push({
                     identifier  : identifier,
                     type        : type,

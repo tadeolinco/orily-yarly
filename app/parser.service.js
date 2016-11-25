@@ -3,7 +3,7 @@
         .module('app')
         .factory('parser', parser);
 
-    function parser() {
+    function parser(semantic) {
         var length=0;
 
 
@@ -11,12 +11,10 @@
             analyze: analyze
         };
 
-        function analyze(tokens, symbols) {
+        function analyze(tokens, symbols, terminal) {
             updateVariables(tokens, symbols);
-            var t = tokens.slice(0);
-            parseLine(tokens);           
+            parseLine(tokens, terminal, symbols);           
         }
-        
 
         function updateVariables(tokens, symbols) {
             for (symbol of symbols) {
@@ -48,16 +46,21 @@
            
         }
     
-        function parseLine(tokens){
+        function parseLine(tokens, terminal, symbols){
             var line = [];
             for (token of tokens){
                 if (token.classification != 'statement delimiter')
                     line.push(token);
                 else {
-                    console.log(line);
                     console.log(statementLegality(line));
+                    semantic.analyze(line, terminal, symbols);
                     line = []; 
                 }
+            }
+            if (line.length) {
+                console.log(statementLegality(line));
+                semantic.analyze(line, terminal, symbols);
+                line = []; 
             }
         }
 
@@ -76,11 +79,11 @@
 
         function expression(line){
             console.log(length+'[checking] expression');
-            if (literal(line))                         return true;
+            if (literal(line))                           return true;
             //if (concatenation(line))         return true;
             //if (functionCall(line))          return true;
             //if (conditionalExpression(line)) return true;
-            if (arithmeticOperation(line))             return true;
+            if (arithmeticExpression(line))              return true;
             //if (castingOperator(line))       return true;
             if (expect('variable identifier', line))     return true;
             return false; 
@@ -102,8 +105,8 @@
             return false;
         }
 
-        function arithmeticOperation(line) {
-            console.log(length+'[checking] arithmeticOperation');
+        function arithmeticExpression(line) {
+            console.log(length+'[checking] arithmeticExpression');
             if (mathOperation(line)
             && expression(line)
             && expect('parameter delimiter', line)
@@ -125,7 +128,17 @@
 
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
-            var i = 0;
+            /* HAI */
+            length = 0;
+            if (expect('code delimiter start', line)) {
+                return true;
+            }
+
+            length = 0;
+            /* KTHXBYE */
+            if (expect('code delimiter end', line)) {
+                return true;
+            }
 
             /* VISIBLE */
             length = 0;
