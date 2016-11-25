@@ -10,6 +10,7 @@
         vm.text = "";
         vm.tokens = [];
         vm.symbols = [];
+        vm.terminal = [];
 
         vm.execute = execute;
         vm.loadFile = loadFile;
@@ -26,7 +27,7 @@
             vm.tokens = [];
             vm.symbols = [];
             lexer.analyze(vm.text, vm.tokens, vm.symbols);
-            parser.analyze(vm.tokens, vm.symbols);
+            parser.analyze(vm.tokens, vm.symbols, vm.terminal);
             console.log(vm.tokens);
             console.log(vm.symbols);
         }
