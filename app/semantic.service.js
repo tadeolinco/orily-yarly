@@ -22,6 +22,25 @@
                     }
                 }
             }
+			if(line[0].classification === 'output delimiter'){
+				if(line[1].classification === 'string delimiter')
+					terminal.push(line.slice(2));
+				else{
+					var value = evaluateMath(line.slice(1)); 
+					terminal.push(value);
+				}
+			}
+			if(line[0].classification === 'variable identifier'){
+				// <var> R <expression>
+				if(line.length > 2){
+					for(symbol of symbols){
+						if(symbol.identifier === line[0].lexeme){
+							symbol.value = evaluateMath(line.slice(2));
+							break;
+						}
+					}			
+				}
+			}
         }
 
         function evaluateMath(tokens) {
@@ -78,7 +97,7 @@
                             classification: 'integer literal'
                         }); 
                         break;
-
+					
                     default:
                         stack.push(tokens[i]);
                 }
