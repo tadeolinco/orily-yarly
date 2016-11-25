@@ -52,15 +52,21 @@
                 if (token.classification != 'statement delimiter')
                     line.push(token);
                 else {
-                    console.log(statementLegality(line));
+                    if (!statementLegality(line)) {
+                        terminal.push('UNEXPECTED TOKEN');
+                        break;
+                    }
                     semantic.analyze(line, terminal, symbols, input);
                     line = []; 
                 }
             }
             if (line.length) {
-                console.log(statementLegality(line));
-                semantic.analyze(line, terminal, symbols, input);
-                line = []; 
+                if (!statementLegality(line)) {
+                        terminal.push('UNEXPECTED TOKEN');
+                } else {
+                    semantic.analyze(line, terminal, symbols, input);
+                    line = []; 
+                }
             }
         }
 
