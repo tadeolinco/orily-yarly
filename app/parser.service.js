@@ -82,7 +82,7 @@
             //if (conditionalExpression(line)) return true;
             if (arithmeticOperation(line))             return true;
             //if (castingOperator(line))       return true;
-            if expect('variable identifier', line)     return true;
+            if (expect('variable identifier', line))     return true;
             return false; 
         }
 
