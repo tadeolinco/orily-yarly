@@ -34,7 +34,7 @@
             }
 			if(line[0].classification === 'output delimiter'){
 				if(line[1].classification === 'string delimiter')
-					terminal.push(line.slice(2));
+					terminal.push(line[2]);
 				else{
 					var value = evaluateMath(line.slice(1),symbols); 
 					terminal.push(value);
@@ -46,6 +46,17 @@
 					for(symbol of symbols){
 						if(symbol.identifier === line[0].lexeme){
 							symbol.value = evaluateMath(line.slice(2),symbols);
+                            var string = symbol.value.toString();
+                            if (/\.\d+$/.test(string))
+                                symbol.type = 'NUMBAR';
+                            else if (/^\d+$/.test(string))
+                                symbol.type = 'NUMBR';
+                            else if (/^(WIN|FAIL)$/.test(string))
+                                symbol.type = 'TROOF';
+                            else if (/^".*"$/)
+                                symbol.type = 'YARN';
+                            else 
+                                symbol.type = 'NOOB';
 							break;
 						}
 					}			
