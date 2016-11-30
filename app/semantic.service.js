@@ -45,12 +45,13 @@
 
 			if(line[0].classification === 'output delimiter'){
 				if(line[1].classification === 'string delimiter')
-					terminal.push(line[2]);
+					terminal.push(line[2].lexeme);
 				else{
 					var value = evaluateMath(line.slice(1),symbols); 
 					terminal.push(value);
 				}
 			}
+
 			if(line[0].classification === 'variable identifier'){
 				// <var> R <expression>
 				if(line.length > 2){
@@ -139,6 +140,35 @@
                                 break;
                             }
                         }
+                        break;
+                    default:
+                        stack.push(tokens[i]);
+                }
+            } 
+            var result = stack.pop().lexeme;
+            if (result === '"') {
+                result = result.concat(stack.pop().lexeme, stack.pop().lexeme);
+            }
+            return result;
+        }
+
+        function evaluateConditionalExpression(tokens, symbols) {
+            var stack = [];
+            for (let i=tokens.length-1; i>=0; i--) {
+                switch(tokens[i].classification) {
+                    case 'parameter delimiter':
+                        break;
+                    case 'binary equality operation':
+                        var num1 = +stack.pop().lexeme;
+                        var num2 = +stack.pop().lexeme;
+                        var result = (num1 = num2)? true : false;
+                        return result;
+                        break;
+                    case 'binary inequality operation':
+                        var num1 = +stack.pop().lexeme;
+                        var num2 = +stack.pop().lexeme;
+                        var result = (num1 != num2)? true : false;
+                        return result; 
                         break;
                     default:
                         stack.push(tokens[i]);
