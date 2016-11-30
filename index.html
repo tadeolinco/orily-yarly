@@ -49,14 +49,12 @@
                     <table class="ui celled table">
                         <thead>
                             <tr><th><center>Identifier</center></th>
-                            <th><center>Type</center></th>
                             <th><center>Value</center></th>
                         </tr></thead>
                         <tbody>
                             <tr ng-repeat="symbol in lol.symbols">
                                 <td>{{symbol.identifier}}</td>
-                                <td>{{symbol.type}}</td>
-                                <td></td>
+                                <td>{{symbol.value}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -72,6 +70,16 @@
             <div class = "twelve wide column">
                 <h3 class="ui top attached segment">Console</h3>
                 <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:25vh">
+                    <ol style="list-style-type: none;">
+                        <li ng-repeat="variable in lol.terminal">
+                            >> {{variable}}
+                        </li>
+                        <form ng-show="lol.input.flag" ng-submit="lol.submit()">
+                            <div class="ui fluid icon input">
+                            >> <input type = "text" id="userInput" ng-model="lol.input.value">
+                            </div>
+                        </form>
+                    </ol>
                 </div>
             </div>
 
@@ -112,6 +120,7 @@
     <script type="text/javascript" src="app/ng-file-input.js"></script>
     <script type="text/javascript" src="app/lexer.service.js"></script>
     <script type="text/javascript" src="app/parser.service.js"></script>
+    <script type="text/javascript" src="app/semantic.service.js"></script>
     <script type="text/javascript" src="app/lol.controller.js"></script>
 
 </body>
