@@ -88,7 +88,7 @@
             if (literal(line))                           return true;
             if (concatenation(line))                     return true;
             //if (functionCall(line))          return true;
-            if (conditionalExpression(line)) return true;
+            if (conditionalExpression(line))             return true;
             if (arithmeticExpression(line))              return true;
             //if (castingOperator(line))       return true;
             if (expect('variable identifier', line))     return true;
@@ -230,6 +230,48 @@
             /* Checks if expression */
             length = 0;
             if (expression(line)) {
+                return true;
+            }
+
+            /* IF  */
+            length = 0;
+            if (expect('conditional delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional if delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional else if delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional else delimiter', line)){
+                return true;
+            }
+
+            /* SWITCH */
+            length = 0;
+            if (expect('switch delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('case delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('default delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional delimiter end', line)){
                 return true;
             }
 
