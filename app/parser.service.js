@@ -86,9 +86,9 @@
         function expression(line){
             console.log(length+'[checking] expression');
             if (literal(line))                           return true;
-            //if (concatenation(line))         return true;
+            if (concatenation(line))                     return true;
             //if (functionCall(line))          return true;
-            //if (conditionalExpression(line)) return true;
+            if (conditionalExpression(line))             return true;
             if (arithmeticExpression(line))              return true;
             //if (castingOperator(line))       return true;
             if (expect('variable identifier', line))     return true;
@@ -108,6 +108,58 @@
             if (expect('string delimiter', line)
             && expect('string literal', line)
             && expect('string delimiter', line)) return true;
+            return false;
+        }
+
+        /* Requires function string to check if concatenation is legal */
+        function concatenation(line) {
+            console.log(length+'[checking] concatenation');
+            if (string(line)
+                && expect('parameter delimiter', line)
+                && string(line)) return true;
+            return false;
+        }
+
+        function binaryConditionalExpression(line) {
+            console.log(length+'[checking] binaryConditionalExpression');
+            if (expect('AND operation', line)) return true;
+            if (expect('OR operation', line)) return true;
+            if (expect('XOR operation', line)) return true;
+            if (expect('binary equality operation', line)) return true;
+            if (expect('binary inequality operation', line)) return true;
+            return false;
+        }
+
+        function multipleConditionalExpression(line) {
+            console.log(length+'[checking] multipleConditionalExpression');
+            if (expect('infinite arity AND', line)) return true;
+            if (expect('infinite arity OR', line)) return true;
+            return false;
+        }
+
+        function conditionalExpressionInfiniteArity(line) {
+            console.log(length+'[checking] conditionalExpressionInfiniteArity');
+            if (expect('parameter delimiter', line) 
+                && expression(line)) {
+                conditionalExpressionInfiniteArity(line);
+                return true;
+            }
+            return false;
+        }
+
+        function conditionalExpression(line) {
+            console.log(length+'[checking] conditionalExpression');
+             // Checks for unary operation 
+            if (expect('unary negation operation', line)
+                && expression(line))                        return true;
+            if (binaryConditionalExpression(line)
+                && expression(line) 
+                && expect('parameter delimiter', line)
+                && expression(line))                        return true;
+            if (multipleConditionalExpression(line) 
+                && expression(line)
+                && conditionalExpressionInfiniteArity(line)
+                && expect('infinite arity delimiter', line))        return true;
             return false;
         }
 
@@ -178,6 +230,48 @@
             /* Checks if expression */
             length = 0;
             if (expression(line)) {
+                return true;
+            }
+
+            /* IF  */
+            length = 0;
+            if (expect('conditional delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional if delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional else if delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional else delimiter', line)){
+                return true;
+            }
+
+            /* SWITCH */
+            length = 0;
+            if (expect('switch delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('case delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('default delimiter', line)){
+                return true;
+            }
+
+            length = 0;
+            if (expect('conditional delimiter end', line)){
                 return true;
             }
 
