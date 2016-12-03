@@ -8,15 +8,66 @@
     function semantic() {
         const ERROR = 'ERROR PARSING STRING';
         var printNewline = true;
+        var startFlag = null;
+        var endFlag = null;
+        var startingFlag = null;
+        var endingFlag = null;
 
         return service = {
             analyze: analyze,
-            changeType: changeType
+            changeType: changeType,
+            restart: restart
         };
 
+        function restart(){
+            startFlag = null;
+            endFlag = null;
+        }
+
         function analyze(line, terminal, symbols, input) {
+            
             if (!line.length) return;
-                
+           
+            else if(line[0].classification === 'code delimiter start' 
+                || line[0].classification === 'code delimiter end' 
+                || line[0].classification === 'line comment delimiter'){
+                return;
+            }
+
+            else if (startFlag != null) {
+
+                // Checks if classification is as indicated in startFlag
+
+                if (line[0].classification === startFlag[0]) {
+                    
+                    // In case of 'OIC'
+                    if (line.length == 1) {
+                       startFlag = null;
+                       return;
+                    } 
+
+                    // Retrieves if case literal
+                    var result = evaluate(line.slice(1),symbols, terminal);
+                    var actualValue = result[0].lexeme;
+                    // Case if retrieved is string
+                    if (result.length === 3) {
+                        actualValue += result[1].lexeme + result[2].lexeme;
+                    }
+                    // Compares startFlag literal to true literal
+                    if (startFlag[1] === actualValue){
+                        startFlag = null;
+                        return;
+                    }
+                } 
+                else if (line[0].classification === 'default case delimiter' 
+                    && startFlag[0] !== 'conditional delimiter end') {                    
+                    startFlag = null;
+                    return;
+                }
+                return;
+            }
+
+            
             else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
                     for (let symbol of symbols) {
@@ -102,14 +153,55 @@
                         }
 					}			
 				}
+                if(line.length === 1){
+                    for(let symbol of symbols){
+                        if(symbol.identifier === line[0].lexeme){
+                           
+                                    symbols[0].value = symbol.value ;
+                                    symbols[0].type= symbol.type;
+                                    break;                          
+                        }
+                    }
+                }
 			}
-        } 
+
+            else if (line[0].classification === 'switch delimiter'){
+                startFlag = ['case delimiter', symbols[0].value];
+                endFlag = ['conditional delimiter end', 'break delimiter'];                
+            }
+
+            else if (endFlag != null) {
+                for (let end of endFlag) {
+                    if (end === line[0].classification) {
+                        if (end != 'conditional delimiter end') {
+                            startFlag = ['conditional delimiter end'];
+                        }
+                            endFlag = null;
+                    }
+                }
+            }
+            else{
+                var result = evaluate(line,symbols,terminal);
+                    if (result != ERROR) {
+                    symbols[0].value = result[0].lexeme;
+                    symbols[0].type = changeType(result[0].classification);
+                    if (result.length === 3) {
+                        symbols[0].value += result[1].lexeme + result[2].lexeme;
+                        symbols[0].type = changeType(result[1].classification);
+                    }
+                } else {
+                    return ERROR;
+                }
+            }
+        }
 
         function evaluate(tokens, symbols, terminal) {
             var stack = [];
             for (let i=tokens.length-1; i>=0; i--) {
                 switch(tokens[i].classification) {
                     case 'parameter delimiter':
+                        break;
+                    case 'infinite arity delimiter':
                         break;
                     case 'addition operation':
                         var token1 = castToNumber(checkString(stack.pop(), stack));
@@ -461,6 +553,40 @@
                             }
                         }
                         break;
+                    case 'infinite arity AND':
+                        var lexeme = 'WIN';
+                        var classification = 'boolean literal';
+                        while (stack.length) {
+                            var token = castToBool(checkString(stack.pop(), stack));
+                            if (!token) {
+                                return ERROR;
+                            }
+                            if (token.lexeme === 'FAIL'){
+                                lexeme = 'FAIL';
+                            }
+                        }
+                        stack.push({
+                            lexeme: lexeme,
+                            classification: classification
+                        })
+                        break;
+                    case 'infinite arity OR':
+                        var lexeme = 'FAIL';
+                        var classification = 'boolean literal';
+                        while (stack.length) {
+                            var token = castToBool(checkString(stack.pop(), stack));
+                            if (!token) {
+                                return ERROR;
+                            }
+                            if (token.lexeme === 'WIN'){
+                                lexeme = 'WIN';
+                            }
+                        }
+                        stack.push({
+                            lexeme: lexeme,
+                            classification: classification
+                        })
+                        break;
                     default:
                         stack.push(tokens[i]);
                         
@@ -493,17 +619,6 @@
         }
 
         function changeType(classification) {
-            // var string = symbol.value.toString();
-            // if (/\.\d+$/.test(string))
-            //     return 'NUMBAR';
-            // else if (/^\d+$/.test(string))
-            //     return 'NUMBR';
-            // else if (/^(WIN|FAIL)$/.test(string))
-            //     return 'TROOF';
-            // else if (/^".*"$/)
-            //     return 'YARN';
-            // else 
-            //     return 'NOOB';
             switch (classification) {
                 case 'string literal':
                     return 'YARN';
@@ -543,8 +658,29 @@
                 lexeme: lexeme,
                 classification: classification
             };
+        }
 
+        
+        function castIT(symbol){
+            var trulalu = 'WIN';
+            var falselalu = 'FAIL';
+            var type = 'TROOF'
 
+            if(symbol.type === 'NUMBR' || symbol.type === 'NUMBAR'){
+                if(symbol.value == 0)
+                    symbol.value=falselalu;
+                else
+                    symbol.value= trulalu;
+            }
+            else if(symbol.type === 'YARN'){
+                var str = symbol.value;
+                if(str.replace(/"/g,"") == ""){
+                    symbol.value=falselalu;
+                }
+                else
+                    symbol.value=trulalu;
+            }
+            symbol.type=type;
         }
 
         function castToNumber(token) {

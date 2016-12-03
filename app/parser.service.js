@@ -4,6 +4,7 @@
         .factory('parser', parser);
 
     function parser(semantic) {
+    	var scope = [];
         var column = 0;
         var row = 0;
         var totalTokens = 0;
@@ -71,7 +72,7 @@
         
         function parseLine(start, tokens, terminal, symbols, input, scope){
             var line = [];
-            for (let i=start; i<tokens.length; i++) {
+            for (let i=start; i<tokens.length; i++){
                 totalTokens++;
                 if (tokens[i].classification != 'statement delimiter') {
                     line.push(tokens[i]);
@@ -90,6 +91,7 @@
                     row++;
                     console.log(row + ': LINE DONE!');
                     if (!checkScope(line, scope)) {
+                        console.log('asdasdasd');
                         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
                         break;
                     };
@@ -284,9 +286,12 @@
                 case 'conditional if delimiter':
                 case 'conditional else if delimiter':
                 case 'conditional else delimiter':
+                    if (currScope == 'conditional delimiter')
+                        return true;
+                    break;
                 case 'case delimiter':
                 case 'break delimiter':
-                    if (currScope == 'conditional delimiter')
+                    if (currScope == 'switch delimiter')
                         return true;
                     break;
                 default:
@@ -315,8 +320,13 @@
                     scope.pop();
                 return true;
             }
-
-            
+            column = 0;
+            if (expect('variable identifier', line)
+                && expect('assignment operator', line)){
+                    if (expression(line)) 
+                        return true;
+                    return false;
+            }
             /* VISIBLE */
             column = 0;
             if (expect('output delimiter',line) 
@@ -385,32 +395,44 @@
 
             /* SWITCH */
             column = 0;
+            if (expect('switch delimiter', line)) {
+                scope.push('switch delimiter');
+                return true;
+            }
+
+            column = 0;
             if (caseDelimiter(line)) {
                 return true;
             }
 
             column = 0;
-            if (expect('default delimiter', line)) {
+            if (expect('conditional delimiter end', line)) {
+                if (peek(scope) === 'conditional delimiter'
+                || peek(scope) === 'switch delimiter');
+                    scope.pop();
                 return true;
             }
 
             column = 0;
-            if (expect('conditional delimiter end', line)) {
-                if (peek(scope) === 'conditional delimiter');
-                    scope.pop();
+            if (expect('default case delimiter', line)){
                 return true;
             }
 
             column = 0;
             if (expect('block comment delimiter start', line)) {
                 scope.push('block comment delimiter start');
-                return true;
+                return true;    
             }
 
             column = 0;
             if (expect('block comment delimiter end', line)) {
                 if (peek(scope) === 'block comment delimiter start');
                     //scope.pop();
+                return true;
+            }
+
+            column = 0;
+            if (expect('break delimiter', line)){
                 return true;
             }
 

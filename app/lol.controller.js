@@ -3,7 +3,7 @@
         .module('app')
         .controller('lolController', lolController);
 
-    function lolController($scope, lexer, parser) {
+    function lolController($scope, lexer, parser, semantic) {
         var vm = this;
 
         vm.file = null;
@@ -36,6 +36,8 @@
             vm.terminal = [];
             vm.scope = [];
             vm.input = {flag:false, value:""};
+            vm.multiLine =[];
+            semantic.restart();
             lexer.analyze(vm.text, vm.tokens, vm.symbols);
             parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input, vm.scope);
         }

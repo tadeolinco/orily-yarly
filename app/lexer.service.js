@@ -46,7 +46,7 @@
             // [ BREAK ]
             BREAK_DELIMITER                 : /\b(GTFO)[\s,]/,
 
-			// [CONTROL FLOW ]
+			// [ CONTROL FLOW ]
             CONDITIONAL_DELIMITER_START     : /\b(O RLY\?)[\s,]/,
 			CONDITIONAL_IF_DELIMITER        : /\b(YA RLY)[\s,]/,
             CONDITIONAL_ELSE_IF_DELIMITER   : /\b(MEBBE)[\s,]/,
