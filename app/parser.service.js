@@ -4,6 +4,7 @@
         .factory('parser', parser);
 
     function parser(semantic) {
+    	var scope = [];
         var column = 0;
         var row = 0;
         var totalTokens = 0;
