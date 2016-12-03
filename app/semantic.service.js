@@ -129,10 +129,7 @@
                 }
 			}
 
-            /*else if (line[0].classification ==== 'switch delimiter'){
-                startFlag = ['case delimiter', symbols[0].value];
-                endFlag = ['break delimiter','conditional delimiter end'];                
-            }*/
+            
             else{
                 for(let symbol of symbols){
                     if (symbol.identifier === 'IT'){

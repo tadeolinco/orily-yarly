@@ -8,7 +8,7 @@
         const Re = {
             // [ LITERALS ]
             STRING_DELIMITER                : /(")/,
-            NUMBER_START                    : /\s[-\d\.]/,
+            NUMBER_START                    : /\b[-\d\.]/,
             FLOAT                           : /((-\d*\.\d+)|(-?\d+\.\d+))$/,
             INTEGER                         : /((0)|(-?[1-9]\d*))$/,
             BOOLEAN                         : /\b(WIN|FAIL)[\s,]/,
