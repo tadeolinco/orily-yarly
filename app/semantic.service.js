@@ -7,6 +7,8 @@
 
     function semantic() {
         const ERROR = 'ERROR PARSING STRING';
+        var startFlag = null;
+        var endFlag = null;
 
         return service = {
             analyze: analyze,
@@ -14,8 +16,31 @@
         };
 
         function analyze(line, terminal, symbols, input) {
+            
             if (!line.length) return;
-                
+
+            else if (endFlag!=null) {
+                for (end in endFlag) {
+                    if (end === line[0].classification) {
+                        if (end != 'conditional delimiter end') {
+                            startFlag = 'conditional delimiter end';
+                            endFlag = null;
+                            break;
+                        }
+                    break;
+                    }
+                }
+                return;
+            }
+
+            else if (startFlag!=null) {
+                if (line[0].classification === startFlag[0]) {
+                    startFlag = null;
+                } else {
+                    return;
+                }
+            }
+
             else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
                     for (let symbol of symbols) {
@@ -85,6 +110,11 @@
 					}			
 				}
 			}
+
+            else if (line[0].classification ==== 'switch delimiter'){
+                startFlag = ['case delimiter', symbols[0].value];
+                endFlag = ['break delimiter','conditional delimiter end'];                
+            }
         } 
 
         function evaluate(tokens, symbols, terminal) {
@@ -337,7 +367,39 @@
                         }
                         break;
                     case 'infinite arity AND':
-
+                        var lexeme = 'WIN';
+                        var classification = 'boolean literal';
+                        while (stack.length) {
+                            var token = castToBool(checkString(stack.pop(), stack));
+                            if (!token) {
+                                return ERROR;
+                            }
+                            if (token.lexeme === 'FAIL'){
+                                lexeme = 'FAIL';
+                            }
+                        }
+                        stack.push({
+                            lexeme: lexeme,
+                            classification: classification
+                        })
+                        break;
+                    case 'infinite arity OR':
+                        var lexeme = 'FAIL';
+                        var classification = 'boolean literal';
+                        while (stack.length) {
+                            var token = castToBool(checkString(stack.pop(), stack));
+                            if (!token) {
+                                return ERROR;
+                            }
+                            if (token.lexeme === 'WIN'){
+                                lexeme = 'WIN';
+                            }
+                        }
+                        stack.push({
+                            lexeme: lexeme,
+                            classification: classification
+                        })
+                        break;
                     default:
                         stack.push(tokens[i]);
                         

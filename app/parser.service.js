@@ -72,7 +72,7 @@
         function parseLine(start, tokens, terminal, symbols, input){
             var line = [];
             for (let i=start; i<tokens.length; i++){
-                console.log('token index: [' + i + ']');
+                // console.log('token index: [' + i + ']');
                 totalTokens++;
                 if (tokens[i].classification != 'statement delimiter') {
                     line.push(tokens[i]);
@@ -242,6 +242,14 @@
             column = 0;
             if (expect('code delimiter end', line)) {
                 return true;
+            }
+
+            column = 0;
+            if (expect('variable identifier', line)
+                && expect('assignment operator', line)){
+                    if (expression(line)) 
+                        return true;
+                    return false;
             }
 
             /* VISIBLE */
