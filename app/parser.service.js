@@ -326,7 +326,7 @@
             }
 
             column = 0;
-            if (expect('default delimiter', line)){
+            if (expect('default case delimiter', line)){
                 return true;
             }
 

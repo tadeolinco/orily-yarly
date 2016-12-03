@@ -12,8 +12,14 @@
 
         return service = {
             analyze: analyze,
-            changeType: changeType
+            changeType: changeType,
+            restart: restart
         };
+
+        function restart(){
+            startFlag = null;
+            endFlag = null;
+        }
 
         function analyze(line, terminal, symbols, input) {
             
@@ -26,25 +32,36 @@
             }
 
             else if (startFlag != null) {
+
                 // Checks if classification is as indicated in startFlag
+
                 if (line[0].classification === startFlag[0]) {
+                    
+                    // In case of 'OIC'
                     if (line.length == 1) {
                        startFlag = null;
                        return;
-                    } //else { Retrieves if case literal
-                        var result = evaluate(line.slice(1),symbols, terminal);
-                        var actualValue = result[0].lexeme;
-                        // Case if retrieved is string
-                        if (result.length === 3) {
-                            actualValue += result[1].lexeme + result[2].lexeme;
-                        }
-                        // Compares startFlag literal to true literal
-                        if (startFlag[1] === actualValue){
-                            startFlag = null;
-                        }
-                } else {
+                    } 
+
+                    // Retrieves if case literal
+                    var result = evaluate(line.slice(1),symbols, terminal);
+                    var actualValue = result[0].lexeme;
+                    // Case if retrieved is string
+                    if (result.length === 3) {
+                        actualValue += result[1].lexeme + result[2].lexeme;
+                    }
+                    // Compares startFlag literal to true literal
+                    if (startFlag[1] === actualValue){
+                        startFlag = null;
+                        return;
+                    }
+                } 
+                else if (line[0].classification === 'default case delimiter' 
+                    && startFlag[0] !== 'conditional delimiter end') {                    
+                    startFlag = null;
                     return;
                 }
+                return;
             }
             
             else if (line[0].classification === 'declaration delimiter') {
