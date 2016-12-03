@@ -9,6 +9,8 @@
         const ERROR = 'ERROR PARSING STRING';
         var startFlag = null;
         var endFlag = null;
+        var startingFlag = null;
+        var endingFlag = null;
 
         return service = {
             analyze: analyze,
@@ -46,6 +48,7 @@
                     return;
                 }
             }
+
             
             else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
@@ -118,13 +121,10 @@
                 if(line.length === 1){
                     for(let symbol of symbols){
                         if(symbol.identifier === line[0].lexeme){
-                            for(let sm of symbols){
-                                if(sm.identifier === 'IT'){
-                                    sm.value = symbol.value ;
-                                    sm.type= symbol.type;
-                                    break;
-                                }
-                            }                            
+                           
+                                    symbols[0].value = symbol.value ;
+                                    symbols[0].type= symbol.type;
+                                    break;                          
                         }
                     }
                 }
@@ -145,24 +145,27 @@
                     }
                 }
             }
-
+            /*
+            else if( line[0].classification === 'conditional delimiter'){
+                startingFlag = [
+                    {'conditional if delimiter','WIN'},
+                    {'conditional else if delimiter', 'WIN'},
+                    {'conditional else delimiter','FAIL'}
+                    ];
+                endFlag = ['conditional delimiter end', 'break delimiter'];
+            }*/
             else{
-                for(let symbol of symbols){
-                    if (symbol.identifier === 'IT'){
                         var result = evaluate(line,symbols,terminal);
                          if (result != ERROR) {
-                            symbol.value = result[0].lexeme;
+                            symbols[0].value = result[0].lexeme;
                             if (result.length === 3) {
-                               symbol.value += result[1].lexeme + result[2].lexeme;
+                               symbols[0].value += result[1].lexeme + result[2].lexeme;
                             }
-                            symbol.type = changeType(symbol);
+                            symbols[0].type = changeType(symbols[0]);
                         } else {
                                 return ERROR;
                         }
-                        break;
                     }
-                }
-            }
         }
 
         function evaluate(tokens, symbols, terminal) {
@@ -448,6 +451,9 @@
                             classification: classification
                         })
                         break;
+                    case 'line comment delimiter':
+                        stack = [];
+                        break;
                     default:
                         stack.push(tokens[i]);
                         
@@ -507,6 +513,29 @@
                 lexeme: lexeme,
                 classification: classification
             };
+        }
+
+        
+        function castIT(symbol){
+            var trulalu = 'WIN';
+            var falselalu = 'FAIL';
+            var type = 'TROOF'
+
+            if(symbol.type === 'NUMBR' || symbol.type === 'NUMBAR'){
+                if(symbol.value == 0)
+                    symbol.value=falselalu;
+                else
+                    symbol.value= trulalu;
+            }
+            else if(symbol.type === 'YARN'){
+                var str = symbol.value;
+                if(str.replace(/"/g,"") == ""){
+                    symbol.value=falselalu;
+                }
+                else
+                    symbol.value=trulalu;
+            }
+            symbol.type=type;
         }
 
         function castToNumber(token) {
