@@ -18,34 +18,35 @@
         function analyze(line, terminal, symbols, input) {
             
             if (!line.length) return;
+           
             else if(line[0].classification === 'code delimiter start' 
                 || line[0].classification === 'code delimiter end' 
                 || line[0].classification === 'line comment delimiter'){
                 return;
             }
 
-            if (endFlag!=null) {
-                for (end in endFlag) {
-                    if (end === line[0].classification) {
-                        if (end != 'conditional delimiter end') {
-                            startFlag = 'conditional delimiter end';
-                            endFlag = null;
-                        }
-                    return;
-                    }
-                }
-            }
-
-            if (startFlag!=null) {
+            else if (startFlag != null) {
+                // Checks if classification is as indicated in startFlag
                 if (line[0].classification === startFlag[0]) {
-                    if (startFlag[1] == evaluate(line.slice(1),symbols, terminal)){
-                        startFlag = null;
-                    }
+                    if (line.length == 1) {
+                       startFlag = null;
+                       return;
+                    } //else { Retrieves if case literal
+                        var result = evaluate(line.slice(1),symbols, terminal);
+                        var actualValue = result[0].lexeme;
+                        // Case if retrieved is string
+                        if (result.length === 3) {
+                            actualValue += result[1].lexeme + result[2].lexeme;
+                        }
+                        // Compares startFlag literal to true literal
+                        if (startFlag[1] === actualValue){
+                            startFlag = null;
+                        }
                 } else {
                     return;
                 }
             }
-
+            
             else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
                     for (let symbol of symbols) {
@@ -125,15 +126,25 @@
                                 }
                             }                            
                         }
-
                     }
                 }
 			}
 
-            // else if (line[0].classification === 'switch delimiter'){
-            //     startFlag = ['case delimiter', symbols[0].value];
-            //     endFlag = ['break delimiter','conditional delimiter end'];                
-            // }
+            else if (line[0].classification === 'switch delimiter'){
+                startFlag = ['case delimiter', symbols[0].value];
+                endFlag = ['conditional delimiter end', 'break delimiter'];                
+            }
+
+            else if (endFlag != null) {
+                for (let end of endFlag) {
+                    if (end === line[0].classification) {
+                        if (end != 'conditional delimiter end') {
+                            startFlag = ['conditional delimiter end'];
+                        }
+                            endFlag = null;
+                    }
+                }
+            }
 
             else{
                 for(let symbol of symbols){
@@ -150,11 +161,9 @@
                         }
                         break;
                     }
-
                 }
             }
-
-        } 
+        }
 
         function evaluate(tokens, symbols, terminal) {
             var stack = [];

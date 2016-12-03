@@ -335,6 +335,11 @@
                 return true;
             }
 
+            column = 0;
+            if (expect('break delimiter', line)){
+                return true;
+            }
+
             /* Line does not meet anything */
             return false;
   
