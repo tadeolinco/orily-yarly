@@ -93,6 +93,8 @@
                 switch(tokens[i].classification) {
                     case 'parameter delimiter':
                         break;
+                    case 'infinite arity delimiter':
+                        break;
                     case 'addition operation':
                         var token1 = castToNumber(checkString(stack.pop(), stack));
                         var token2 = castToNumber(checkString(stack.pop(), stack));
@@ -334,6 +336,8 @@
                             }
                         }
                         break;
+                    case 'infinite arity AND':
+
                     default:
                         stack.push(tokens[i]);
                         
