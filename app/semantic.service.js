@@ -16,7 +16,7 @@
         function analyze(line, terminal, symbols, input) {
             if (!line.length) return;
                 
-            if (line[0].classification === 'declaration delimiter') {
+            else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
                     for (let symbol of symbols) {
                         if (symbol.identifier === line[1].lexeme) {
@@ -36,7 +36,7 @@
                 }
             }
 
-            if (line[0].classification === 'input delimiter') {
+            else if (line[0].classification === 'input delimiter') {
                 for (let symbol of symbols) {
                     if (symbol.identifier === line[1].lexeme) {
                         input.flag = true;
@@ -46,7 +46,7 @@
                 }
             }
 
-			if (line[0].classification === 'output delimiter') {
+			else if (line[0].classification === 'output delimiter') {
                 var exec = null;
                 var string = '';
 				var result = evaluate(line.slice(1), symbols, terminal);
@@ -65,7 +65,7 @@
 
 
 
-			if (line[0].classification === 'variable identifier'){
+			else if (line[0].classification === 'variable identifier'){
 				// <var> R <expression>
 				if(line.length > 2){
 					for(let symbol of symbols){
