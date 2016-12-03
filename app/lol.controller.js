@@ -11,6 +11,7 @@
         vm.tokens = [];
         vm.symbols = [];
         vm.terminal = [];
+        vm.scope = [];
         vm.input = {
             flag: false, 
             value: '',
@@ -33,9 +34,10 @@
             vm.tokens = [];
             vm.symbols = [];
             vm.terminal = [];
+            vm.scope = [];
             vm.input = {flag:false, value:""};
             lexer.analyze(vm.text, vm.tokens, vm.symbols);
-            parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input);
+            parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input, vm.scope);
         }
 
         function loadFile() {
@@ -49,7 +51,7 @@
         function submit() {
             vm.terminal.push(vm.input.value);
             vm.input.value = "";
-            parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input);
+            parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input, vm.scope);
         }
 
     }

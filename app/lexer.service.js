@@ -8,7 +8,7 @@
         const Re = {
             // [ LITERALS ]
             STRING_DELIMITER                : /(")/,
-            NUMBER_START                    : /\s[-\d\.]/,
+            NUMBER_START                    : /\b[-\d\.]/,
             FLOAT                           : /((-\d*\.\d+)|(-?\d+\.\d+))$/,
             INTEGER                         : /((0)|(-?[1-9]\d*))$/,
             BOOLEAN                         : /\b(WIN|FAIL)[\s,]/,
@@ -41,6 +41,7 @@
             // [ IO ]
             INPUT                           : /\b(GIMMEH)[\s,]/,
             OUTPUT                          : /\b(VISIBLE)[\s,]/,
+            NEWLINE_SUPRESS                 : /(!)[\s,]/,
 
             // [ BREAK ]
             BREAK_DELIMITER                 : /\b(GTFO)[\s,]/,
@@ -55,7 +56,7 @@
             CASE_DELIMITER                  : /\b(OMG)[\s,]/,
             DEFAULT_CASE_DELIMITER          : /\b(OMGWTF)[\s,]/,
 			
-            CONDITIONAL_DELIMITER_END      : /\b(OIC)[\s,]/,
+            CONDITIONAL_DELIMITER_END       : /\b(OIC)[\s,]/,
             
             // [ LOOPS ]
             LOOP_DELIMITER_START            : /\b(IM IN YR)[\s,]/,
@@ -124,7 +125,7 @@
                 if (exec = (Re.CASTING.exec(input))) {
                     checkTrash(exec);
                     switch (exec[1]) {
-                        case "MAEK"     : pushToken(exec[1], 'casting operator');               break;
+                        case "MAEK"     : pushToken(exec[1], 'immediate casting operation');               break;
                         case "IS NOW A" : pushToken(exec[1], 'casting assigment delimiter');    break;
                     }
                     i--;
@@ -357,6 +358,14 @@
                 if (exec = (Re.OUTPUT.exec(input))) {
                     checkTrash(exec);
                     pushToken(exec[1], 'output delimiter');
+                    i--;
+                    continue;
+                }
+
+                // [ NEWLINE SUPRESS ]
+                if (exec = (Re.NEWLINE_SUPRESS.exec(input))) {
+                    checkTrash(exec);
+                    pushToken(exec[1], 'newline supress');
                     i--;
                     continue;
                 }

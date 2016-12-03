@@ -13,13 +13,13 @@
             analyze: analyze
         };
 
-        function analyze(tokens, symbols, terminal, input) {
+        function analyze(tokens, symbols, terminal, input, scope) {
             if (!input.flag) {
                 column = 0;
                 row = 0;
                 totalTokens = 0;
                 updateVariables(tokens, symbols);
-                parseLine(totalTokens, tokens, terminal, symbols, input);           
+                parseLine(totalTokens, tokens, terminal, symbols, input, scope);           
             } else {
                 input.flag = false;
                 for (let symbol of symbols) {
@@ -31,7 +31,7 @@
                 }
                 console.log('total tokens: ' + totalTokens);
                 console.log('length of tokens: ' +tokens.length)
-                parseLine(totalTokens, tokens, terminal, symbols, input); 
+                parseLine(totalTokens, tokens, terminal, symbols, input, scope); 
             }
         }
 
@@ -69,20 +69,30 @@
            
         }
         
-        function parseLine(start, tokens, terminal, symbols, input){
+        function parseLine(start, tokens, terminal, symbols, input, scope){
             var line = [];
-            for (let i=start; i<tokens.length; i++){
-                console.log('token index: [' + i + ']');
+            for (let i=start; i<tokens.length; i++) {
                 totalTokens++;
                 if (tokens[i].classification != 'statement delimiter') {
                     line.push(tokens[i]);
                 } else {
-                    if (!statementLegality(line)) {
-                        terminal.push('UNEXPECTED TOKEN: '+line[column].lexeme);
+                    if (line.length >= 2) {
+                        if (line[line.length-1].classification === 'line comment'
+                        && line[line.length-2].classification === 'line comment delimiter') {
+                            line.pop();
+                            line.pop();
+                        }
+                    }
+                    if (!statementLegality(line, scope)) {
+                        terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
                         break;
                     }  
                     row++;
                     console.log(row + ': LINE DONE!');
+                    if (!checkScope(line, scope)) {
+                        terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+                        break;
+                    };
                     var result = semantic.analyze(line, terminal, symbols, input);
                     if (result === ERROR) {
                         terminal.push(ERROR);
@@ -96,17 +106,17 @@
                 }
             }
             // if (line.length) {
-            //     if (!statementLegality(line)) {
-            //             terminal.push('UNEXPECTED TOKEN: '+line[column].lexeme);
-            //     } else {
-            //         row++;
-            //         console.log(row + ': LINE DONE!');
-            //         var result = semantic.analyze(line, terminal, symbols, input);
-            //         if (result === ERROR) {
-            //             terminal.push(ERROR);
-            //         }
-            //         line = []; 
-            //     }
+            //     if (!statementLegality(line, scope)) {
+            //         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+            //     }  
+            //     row++;
+            //     console.log(row + ': LINE DONE!');
+            //     if (!checkScope(line, scope)) {
+            //         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+            //     };
+            // }
+            // if (scope.length) {
+            //     terminal.push('ERROR: NOT PROPERLY TERMINATED');
             // }
         }
 
@@ -122,17 +132,38 @@
             } 
         }
 
-        // 
+        function dataType(line) {
+            console.log(column+'[checking] data type');
+            if (expect('string data type', line))       return true;
+            if (expect('integer data type', line))       return true;
+            if (expect('floating-point data type', line))       return true;
+            if (expect('boolean data type', line))       return true;
+            if (expect('untyped data type', line))       return true;
+            return false;
+        }
+
+        
         function expression(line){
             console.log(column+'[checking] expression');
-            if (literal(line))                           return true;
-            if (expect('variable identifier', line))     return true;
-            if (concatenation(line))                     return true;
+            if (literal(line))                          return true;
+            if (expect('variable identifier', line))    return true;
+            if (concatenation(line))                    return true;
             //if (functionCall(line))          return true;
-            if (conditionalExpression(line))             return true;
-            if (arithmeticExpression(line))              return true;
-            //if (castingOperator(line))       return true;
+            if (conditionalExpression(line))            return true;
+            if (arithmeticExpression(line))             return true;
+            if (dataType(line))                         return true;
+            if (castingOperation(line))                 return true;
             return false; 
+        }
+
+        function castingOperation(line) {
+            console.log(column+'[checking] castingOperation');
+            if (expect('immediate casting operation', line)
+            && expression(line)
+            && dataType(line)) {
+                return true;
+            }
+            return false;
         }
 
         function literal(line) { // i = 1;
@@ -191,6 +222,17 @@
                 return false;
         }
 
+        function outputExpression(line) {
+            console.log(column+'[checking] outputExpression');
+            var result = expression(line);
+            if (!result) {
+                return true;
+            }
+            if (result) {
+                return outputExpression(line);
+            }
+        }
+
         function conditionalExpression(line) {
             console.log(column+'[checking] conditionalExpression');
              // Checks for unary operation 
@@ -228,28 +270,68 @@
             return false;
         }
 
+        function caseDelimiter(line) {
+            console.log(column+'[checking] case');
+            if (expect('case delimiter', line)
+            && literal(line)) return true;
+            return false;
+        }
+
+        function checkScope(line, scope) {
+            if (!line[0]) return true;
+            var currScope = peek(scope);
+            switch (line[0].classification) {
+                case 'conditional if delimiter':
+                case 'conditional else if delimiter':
+                case 'conditional else delimiter':
+                case 'case delimiter':
+                case 'break delimiter':
+                    if (currScope == 'conditional delimiter')
+                        return true;
+                    break;
+                default:
+                    return true;
+            }
+
+
+            return false;
+        }
+
         /* Iterates throughout statement array and checks legality */
-        function statementLegality(line){
+        function statementLegality(line, scope) {
             /* HAI */
             if (!line.length) return true;
 
             column = 0;
             if (expect('code delimiter start', line)) {
+                scope.push('code delimiter start');
                 return true;
             }
 
             /* KTHXBYE */
             column = 0;
             if (expect('code delimiter end', line)) {
+                if (peek(scope) === 'code delimiter start')
+                    scope.pop();
                 return true;
             }
 
+            
             /* VISIBLE */
             column = 0;
-            if (expect('output delimiter',line)){
-                expression(line);
+            if (expect('output delimiter',line) 
+                && outputExpression(line)) {
                 return true;
             }
+
+            /* VISIBLE NEWLINE SUPRESS */
+            column = 0;
+            if (expect('output delimiter',line)
+                && expression(line)
+                && expect('newline supress')) {
+                return true;
+            }
+
 
             /* GIMMEH */
             column = 0;
@@ -282,6 +364,7 @@
             /* IF  */
             column = 0;
             if (expect('conditional delimiter', line)){
+                scope.push('conditional delimiter');
                 return true;
             }
 
@@ -302,28 +385,42 @@
 
             /* SWITCH */
             column = 0;
-            if (expect('switch delimiter', line)){
+            if (caseDelimiter(line)) {
                 return true;
             }
 
             column = 0;
-            if (expect('case delimiter', line)){
+            if (expect('default delimiter', line)) {
                 return true;
             }
 
             column = 0;
-            if (expect('default delimiter', line)){
+            if (expect('conditional delimiter end', line)) {
+                if (peek(scope) === 'conditional delimiter');
+                    scope.pop();
                 return true;
             }
 
             column = 0;
-            if (expect('conditional delimiter end', line)){
+            if (expect('block comment delimiter start', line)) {
+                scope.push('block comment delimiter start');
+                return true;
+            }
+
+            column = 0;
+            if (expect('block comment delimiter end', line)) {
+                if (peek(scope) === 'block comment delimiter start');
+                    //scope.pop();
                 return true;
             }
 
             /* Line does not meet anything */
             return false;
   
+        }
+
+        function peek(stack) {
+            return stack[stack.length-1];
         }
     }
 })();
