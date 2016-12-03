@@ -4,6 +4,7 @@
 
 #userInput {
 	border:none;
+	background:black;
 }
 
 #userInput:focus {
