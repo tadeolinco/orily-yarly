@@ -34,6 +34,7 @@
             vm.symbols = [];
             vm.terminal = [];
             vm.input = {flag:false, value:""};
+            vm.multiLine =[];
             lexer.analyze(vm.text, vm.tokens, vm.symbols);
             parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input);
         }

@@ -268,6 +268,11 @@
                     return false;
             }
 
+            /* LINE COMMENT */
+            column=0;
+            if(expect('line comment delimiter',line)){
+            	return true;
+            }
             /* VARIABLE DECLARATION */
             column = 0;
             if (expect('declaration delimiter', line)){
