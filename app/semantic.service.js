@@ -21,21 +21,20 @@
             else if(line[0].classification === 'code delimiter start' || line[0].classification === 'code delimiter end' || line[0].classification === 'line comment delimiter'){
                 return;
             }
-            else if (endFlag!=null) {
+
+            if (endFlag!=null) {
                 for (end in endFlag) {
                     if (end === line[0].classification) {
                         if (end != 'conditional delimiter end') {
                             startFlag = 'conditional delimiter end';
                             endFlag = null;
-                            break;
                         }
-                    break;
+                    return;
                     }
                 }
-                continue;
             }
 
-            else if (startFlag!=null) {
+            if (startFlag!=null) {
                 if (line[0].classification === startFlag[0]) {
                     if (startFlag[1] == evaluate(line.slice(1),symbols, terminal)){
                         startFlag = null;
@@ -115,15 +114,16 @@
 				}
 			}
 
-            /*else if (line[0].classification ==== 'switch delimiter'){
-                startFlag = ['case delimiter', symbols[0].value];
-                endFlag = ['break delimiter','conditional delimiter end'];                
-            }*/
+            // else if (line[0].classification === 'switch delimiter'){
+            //     startFlag = ['case delimiter', symbols[0].value];
+            //     endFlag = ['break delimiter','conditional delimiter end'];                
+            // }
+
             else{
                 for(let symbol of symbols){
                     if (symbol.identifier === 'IT'){
                         var result = evaluate(line,symbols,terminal);
-                         if (result !== ERROR) {
+                         if (result != ERROR) {
                             symbol.value = result[0].lexeme;
                             if (result.length === 3) {
                                symbol.value += result[1].lexeme + result[2].lexeme;
