@@ -34,8 +34,8 @@
                     </tr></thead>
                     <tbody>
                         <tr ng-repeat="token in lol.tokens">
-                            <td> {{token.lexeme}}</td>
-                            <td> {{token.classification}}</td>
+                            <td>{{token.lexeme}}</td>
+                            <td>{{token.classification}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -48,12 +48,16 @@
                    <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:50vh">
                     <table class="ui celled table">
                         <thead>
-                            <tr><th><center>Identifier</center></th>
-                            <th><center>Value</center></th>
-                        </tr></thead>
+                            <tr>
+                                <th><center>Identifier</center></th>
+                                <th><center>Type</center></th>
+                                <th><center>Value</center></th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr ng-repeat="symbol in lol.symbols">
                                 <td>{{symbol.identifier}}</td>
+                                <td>{{symbol.type}}</td>
                                 <td>{{symbol.value}}</td>
                             </tr>
                         </tbody>
@@ -70,13 +74,13 @@
             <div class = "twelve wide column">
                 <h3 class="ui top attached segment">Console</h3>
                 <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:25vh">
-                    <ol style="list-style-type: none;">
-                        <li ng-repeat="variable in lol.terminal">
-                            >> {{variable}}
+                    <ol style="list-style-type: none; margin: 0; padding: 0;">
+                        <li ng-repeat="variable in lol.terminal track by $index">
+                            >> {{lol.terminal[$index]}}
                         </li>
                         <form ng-show="lol.input.flag" ng-submit="lol.submit()">
                             <div class="ui fluid icon input">
-                            >> <input type = "text" id="userInput" ng-model="lol.input.value">
+                            >> <input type = "text" id="userInput" ng-model="lol.input.value" style="padding: 0;">
                             </div>
                         </form>
                     </ol>

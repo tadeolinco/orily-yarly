@@ -76,7 +76,6 @@
             BOOLEAN_OPERATOR                : /\b(BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT)[\s,]/,
             CONCATENATION                   : /\b(SMOOSH)[\s,]/,
             CASTING                         : /\b(MAEK|IS NOW A)[\s,]/,
-            CASTING_SEPARATOR               : /\b(A)[\s,]/,
             MATH_OPERATOR                   : /\b(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)[\s,]/,
             INFINITE_ARITY_DELIMITER        : /\b(MKAY)[\s,]/,
 
@@ -128,14 +127,6 @@
                         case "MAEK"     : pushToken(exec[1], 'casting operator');               break;
                         case "IS NOW A" : pushToken(exec[1], 'casting assigment delimiter');    break;
                     }
-                    i--;
-                    continue;
-                }
-
-                // [ CASTING SEPARATOR ]
-                if (exec = (Re.CASTING_SEPARATOR.exec(input))) {
-                    checkTrash(exec);
-                    pushToken(exec[1], 'casting separator');
                     i--;
                     continue;
                 }

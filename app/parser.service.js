@@ -4,16 +4,35 @@
         .factory('parser', parser);
 
     function parser(semantic) {
-        var length=0;
-
+        var column = 0;
+        var row = 0;
+        var totalTokens = 0;
+        const ERROR = 'ERROR PARSING STRING';
 
         return service = {
             analyze: analyze
         };
 
         function analyze(tokens, symbols, terminal, input) {
-            updateVariables(tokens, symbols);
-            parseLine(tokens, terminal, symbols, input);           
+            if (!input.flag) {
+                column = 0;
+                row = 0;
+                totalTokens = 0;
+                updateVariables(tokens, symbols);
+                parseLine(totalTokens, tokens, terminal, symbols, input);           
+            } else {
+                input.flag = false;
+                for (let symbol of symbols) {
+                    if (symbol.identifier === input.symbol) {
+                        symbol.value = '"'+terminal[terminal.length-1]+'"';
+                        symbol.type = 'YARN';
+                        break;
+                    }
+                }
+                console.log('total tokens: ' + totalTokens);
+                console.log('length of tokens: ' +tokens.length)
+                parseLine(totalTokens, tokens, terminal, symbols, input); 
+            }
         }
 
         function updateVariables(tokens, symbols) {
@@ -43,60 +62,81 @@
                     if (found) break;
                 }
             }
+            for (token of tokens) {
+                if (token.lexeme === 'IT')
+                    token.classification = 'variable identifier';
+            }
            
         }
-    
-        function parseLine(tokens, terminal, symbols, input){
+        
+        function parseLine(start, tokens, terminal, symbols, input){
             var line = [];
-            for (token of tokens){
-                if (token.classification != 'statement delimiter')
-                    line.push(token);
-                else {
+            for (let i=start; i<tokens.length; i++){
+                console.log('token index: [' + i + ']');
+                totalTokens++;
+                if (tokens[i].classification != 'statement delimiter') {
+                    line.push(tokens[i]);
+                } else {
                     if (!statementLegality(line)) {
-                        terminal.push('UNEXPECTED TOKEN');
+                        terminal.push('UNEXPECTED TOKEN: '+line[column].lexeme);
+                        break;
+                    }  
+                    row++;
+                    console.log(row + ': LINE DONE!');
+                    var result = semantic.analyze(line, terminal, symbols, input);
+                    if (result === ERROR) {
+                        terminal.push(ERROR);
                         break;
                     }
-                    semantic.analyze(line, terminal, symbols, input);
+                    if (line.length && line[0].classification == 'input delimiter') {
+                        line = [];
+                        break;
+                    }
                     line = []; 
                 }
             }
-            if (line.length) {
-                if (!statementLegality(line)) {
-                        terminal.push('UNEXPECTED TOKEN');
-                } else {
-                    semantic.analyze(line, terminal, symbols, input);
-                    line = []; 
-                }
-            }
+            // if (line.length) {
+            //     if (!statementLegality(line)) {
+            //             terminal.push('UNEXPECTED TOKEN: '+line[column].lexeme);
+            //     } else {
+            //         row++;
+            //         console.log(row + ': LINE DONE!');
+            //         var result = semantic.analyze(line, terminal, symbols, input);
+            //         if (result === ERROR) {
+            //             terminal.push(ERROR);
+            //         }
+            //         line = []; 
+            //     }
+            // }
         }
 
         /* Checks if type meets expectations */
         function expect(expected, line){
-            if (length === line.length) return false;
-            if (expected == line[length].classification) {
-                console.log('[GOT] '+line[length].classification);
-                length++;
+            if (column === line.length) return false;
+            if (expected == line[column].classification) {
+                console.log(column + '[GOT] '+line[column].classification);
+                column++;
                 return true; 
             } else {
                 return false;
             } 
         }
 
-
+        // 
         function expression(line){
-            console.log(length+'[checking] expression');
+            console.log(column+'[checking] expression');
             if (literal(line))                           return true;
+            if (expect('variable identifier', line))     return true;
             if (concatenation(line))                     return true;
             //if (functionCall(line))          return true;
             if (conditionalExpression(line))             return true;
             if (arithmeticExpression(line))              return true;
             //if (castingOperator(line))       return true;
-            if (expect('variable identifier', line))     return true;
             return false; 
         }
 
         function literal(line) { // i = 1;
-            console.log(length+'[checking] literal');
+            console.log(column+'[checking] literal');
             if (string(line))                               return true;
             if (expect('boolean literal', line))            return true;
             if (expect('floating-point literal', line))     return true;
@@ -111,17 +151,17 @@
             return false;
         }
 
-        /* Requires function string to check if concatenation is legal */
+        /* CHECK IN SEMANTIC FOR VALUE OF EXPRESSION */
         function concatenation(line) {
-            console.log(length+'[checking] concatenation');
-            if (string(line)
-                && expect('parameter delimiter', line)
-                && string(line)) return true;
+            console.log(column+'[checking] concatenation operation');
+            if (expect('concatenation operation', line)
+                && expression(line)
+                && expressionInfiniteArity(line)) return true;
             return false;
         }
 
         function binaryConditionalExpression(line) {
-            console.log(length+'[checking] binaryConditionalExpression');
+            console.log(column+'[checking] binaryConditionalExpression');
             if (expect('AND operation', line)) return true;
             if (expect('OR operation', line)) return true;
             if (expect('XOR operation', line)) return true;
@@ -131,24 +171,28 @@
         }
 
         function multipleConditionalExpression(line) {
-            console.log(length+'[checking] multipleConditionalExpression');
+            console.log(column+'[checking] multipleConditionalExpression');
             if (expect('infinite arity AND', line)) return true;
             if (expect('infinite arity OR', line)) return true;
             return false;
         }
 
-        function conditionalExpressionInfiniteArity(line) {
-            console.log(length+'[checking] conditionalExpressionInfiniteArity');
+        function expressionInfiniteArity(line) {
+            console.log(column+'[checking] expressionInfiniteArity');
+            var currentIndex = column;
             if (expect('parameter delimiter', line) 
-                && expression(line)) {
-                conditionalExpressionInfiniteArity(line);
+                && expression(line)
+                && expressionInfiniteArity(line)) {
                 return true;
             }
-            return false;
+            if (currentIndex === column) 
+                return true;
+            else 
+                return false;
         }
 
         function conditionalExpression(line) {
-            console.log(length+'[checking] conditionalExpression');
+            console.log(column+'[checking] conditionalExpression');
              // Checks for unary operation 
             if (expect('unary negation operation', line)
                 && expression(line))                        return true;
@@ -158,13 +202,13 @@
                 && expression(line))                        return true;
             if (multipleConditionalExpression(line) 
                 && expression(line)
-                && conditionalExpressionInfiniteArity(line)
+                && expressionInfiniteArity(line)
                 && expect('infinite arity delimiter', line))        return true;
             return false;
         }
 
         function arithmeticExpression(line) {
-            console.log(length+'[checking] arithmeticExpression');
+            console.log(column+'[checking] arithmeticExpression');
             if (mathOperation(line)
             && expression(line)
             && expect('parameter delimiter', line)
@@ -173,7 +217,7 @@
         }
 
         function mathOperation(line) {
-            console.log(length+'[checking] mathOperation');
+            console.log(column+'[checking] mathOperation');
             if (expect('addition operation', line)) return true;
             if (expect('subtraction operation', line)) return true;
             if (expect('multiplication operation', line)) return true;
@@ -187,26 +231,28 @@
         /* Iterates throughout statement array and checks legality */
         function statementLegality(line){
             /* HAI */
-            length = 0;
+            if (!line.length) return true;
+
+            column = 0;
             if (expect('code delimiter start', line)) {
                 return true;
             }
 
             /* KTHXBYE */
-            length = 0;
+            column = 0;
             if (expect('code delimiter end', line)) {
                 return true;
             }
 
             /* VISIBLE */
-            length = 0;
+            column = 0;
             if (expect('output delimiter',line)){
                 expression(line);
                 return true;
             }
 
             /* GIMMEH */
-            length = 0;
+            column = 0;
             if (expect('input delimiter', line)){
                 if (expect('variable identifier', line))
                     return true;
@@ -215,7 +261,7 @@
             }
 
             /* VARIABLE DECLARATION */
-            length = 0;
+            column = 0;
             if (expect('declaration delimiter', line)){
                 if (expect('variable identifier', line)){
                     if (expect('initialization delimiter', line)){
@@ -228,49 +274,49 @@
             }
 
             /* Checks if expression */
-            length = 0;
+            column = 0;
             if (expression(line)) {
                 return true;
             }
 
             /* IF  */
-            length = 0;
+            column = 0;
             if (expect('conditional delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('conditional if delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('conditional else if delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('conditional else delimiter', line)){
                 return true;
             }
 
             /* SWITCH */
-            length = 0;
+            column = 0;
             if (expect('switch delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('case delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('default delimiter', line)){
                 return true;
             }
 
-            length = 0;
+            column = 0;
             if (expect('conditional delimiter end', line)){
                 return true;
             }

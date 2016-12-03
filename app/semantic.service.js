@@ -6,183 +6,440 @@
         .factory('semantic', semantic);
 
     function semantic() {
+        const ERROR = 'ERROR PARSING STRING';
 
         return service = {
-            analyze: analyze
+            analyze: analyze,
+            changeType: changeType
         };
 
         function analyze(line, terminal, symbols, input) {
+            if (!line.length) return;
+                
             if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
-                    for (symbol of symbols) {
+                    for (let symbol of symbols) {
                         if (symbol.identifier === line[1].lexeme) {
-                            symbol.value = evaluateMath(line.slice(3), symbols);
-                            var string = symbol.value.toString();
-                            if (/\.\d+$/.test(string))
-                                symbol.type = 'NUMBAR';
-                            else if (/^\d+$/.test(string))
-                                symbol.type = 'NUMBR';
-                            else if (/^(WIN|FAIL)$/.test(string))
-                                symbol.type = 'TROOF';
-                            else if (/^".*"$/)
-                                symbol.type = 'YARN';
-                            else 
-                                symbol.type = 'NOOB';
+                            var result = evaluate(line.slice(3), symbols, terminal);
+                            if (result !== ERROR) {
+                                symbol.value = result[0].lexeme;
+                                if (result.length === 3) {
+                                    symbol.value += result[1].lexeme + result[2].lexeme;
+                                }
+                                symbol.type = changeType(symbol);
+                            } else {
+                                return ERROR;
+                            }
+                            break;
                         }
                     }
                 }
             }
 
             if (line[0].classification === 'input delimiter') {
-                for (symbol of symbols) {
+                for (let symbol of symbols) {
                     if (symbol.identifier === line[1].lexeme) {
                         input.flag = true;
-                        symbol.value = input.value;                        
+                        input.symbol = symbol.identifier;                        
                         break;
                     }
                 }
             }
 
-			if(line[0].classification === 'output delimiter'){
-				if(line[1].classification === 'string delimiter')
-					terminal.push(line[2].lexeme);
-				else{
-					var value = evaluateMath(line.slice(1),symbols); 
-					terminal.push(value);
-				}
+			if (line[0].classification === 'output delimiter') {
+                var exec = null;
+                var string = '';
+				var result = evaluate(line.slice(1), symbols, terminal);
+                if (result !== ERROR) {
+                    for (let token of result) {
+                        if (exec = (/"(.*)"/.exec(token.lexeme)))
+                            string = exec[1] + string;
+                        else if (token.lexeme !== '"')
+                            string = token.lexeme + string;
+                    }
+                    terminal.push(string);   
+                } else {
+                    return ERROR;
+                }
 			}
 
-			if(line[0].classification === 'variable identifier'){
+
+
+			if (line[0].classification === 'variable identifier'){
 				// <var> R <expression>
 				if(line.length > 2){
-					for(symbol of symbols){
-						if(symbol.identifier === line[0].lexeme){
-							symbol.value = evaluateMath(line.slice(2),symbols);
-                            var string = symbol.value.toString();
-                            if (/\.\d+$/.test(string))
-                                symbol.type = 'NUMBAR';
-                            else if (/^\d+$/.test(string))
-                                symbol.type = 'NUMBR';
-                            else if (/^(WIN|FAIL)$/.test(string))
-                                symbol.type = 'TROOF';
-                            else if (/^".*"$/)
-                                symbol.type = 'YARN';
-                            else 
-                                symbol.type = 'NOOB';
-							break;
-						}
+					for(let symbol of symbols){
+						if (symbol.identifier === line[0].lexeme) {
+                            var result = evaluate(line.slice(2), symbols, terminal);
+                            if (result !== ERROR) {
+                                symbol.value = result[0].lexeme;
+                                if (result.length === 3) {
+                                    symbol.value += result[1].lexeme + result[2].lexeme;
+                                }
+                                symbol.type = changeType(symbol);
+                            } else {
+                                return ERROR;
+                            }
+                            break;
+                        }
 					}			
 				}
 			}
-        }
+        } 
 
-        function evaluateMath(tokens, symbols) {
+        function evaluate(tokens, symbols, terminal) {
             var stack = [];
             for (let i=tokens.length-1; i>=0; i--) {
                 switch(tokens[i].classification) {
                     case 'parameter delimiter':
                         break;
                     case 'addition operation':
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = token1.lexeme + token2.lexeme;
+                        var classification = 'integer literal';
+                        if (token1.classification === 'floating-point literal' ||
+                        token2.classification === 'floating-point literal') {
+                            classification = 'floating-point literal';
+                        }
+
                         stack.push({
-                            lexeme: +stack.pop().lexeme + +stack.pop().lexeme,
-                            classification: 'integer literal'
+                            lexeme: lexeme,
+                            classification: classification
                         });
                         break;
                     case 'subtraction operation':
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = token1.lexeme - token2.lexeme;
+                        var classification = 'integer literal';
+                        if (token1.classification === 'floating-point literal' ||
+                        token2.classification === 'floating-point literal') {
+                            classification = 'floating-point literal';
+                        }
+
                         stack.push({
-                            lexeme: +stack.pop().lexeme - +stack.pop().lexeme,
-                            classification: 'integer literal'
+                            lexeme: lexeme,
+                            classification: classification
                         });
                         break;
                     case 'multiplication operation':
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = token1.lexeme * token2.lexeme;
+                        var classification = 'integer literal';
+                        if (token1.classification === 'floating-point literal' ||
+                        token2.classification === 'floating-point literal') {
+                            classification = 'floating-point literal';
+                        }
+
                         stack.push({
-                            lexeme: +stack.pop().lexeme * +stack.pop().lexeme,
-                            classification: 'integer literal'
+                            lexeme: lexeme,
+                            classification: classification
                         });
                         break;
                     case 'division operation':
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = token1.lexeme / token2.lexeme;
+                        var classification = 'integer literal';
+                        if (token1.classification === 'floating-point literal' ||
+                        token2.classification === 'floating-point literal') {
+                            classification = 'floating-point literal';
+                        }
+
                         stack.push({
-                            lexeme: +stack.pop().lexeme / +stack.pop().lexeme,
-                            classification: 'integer literal'
+                            lexeme: lexeme,
+                            classification: classification
                         });
                         break;
                     case 'modulo operation':
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = token1.lexeme % token2.lexeme;
+                        var classification = 'integer literal';
+                        if (token1.classification === 'floating-point literal' ||
+                        token2.classification === 'floating-point literal') {
+                            classification = 'floating-point literal';
+                        }
+
                         stack.push({
-                            lexeme: +stack.pop().lexeme % +stack.pop().lexeme,
-                            classification: 'integer literal'
+                            lexeme: lexeme,
+                            classification: classification
                         });
                         break;
                     case 'maximum operation':
-                        var num1 = +stack.pop().lexeme;
-                        var num2 = +stack.pop().lexeme;
-                        var result = (num1 > num2)? num1 : num2;
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = (token1.lexeme > token2.lexeme)? token1.lexeme : token2.lexeme;
+                        var classification = 'integer literal';
+                        if (lexeme % 1 !== 0) classification = 'floating-point literal';
+
                         stack.push({
-                            lexeme: result,
-                            classification: 'integer literal'
-                        }); 
+                            lexeme: lexeme,
+                            classification: classification
+                        });
                         break;
                     case 'minimum operation':
-                        var num1 = +stack.pop().lexeme;
-                        var num2 = +stack.pop().lexeme;
-                        var result = (num1 < num2)? num1 : num2;
+                        var token1 = castToNumber(checkString(stack.pop(), stack));
+                        var token2 = castToNumber(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = (token1.lexeme < token2.lexeme)? token1.lexeme : token2.lexeme;
+                        var classification = 'integer literal';
+                        if (lexeme % 1 !== 0) classification = 'floating-point literal';
+
                         stack.push({
-                            lexeme: result,
-                            classification: 'integer literal'
-                        }); 
+                            lexeme: lexeme,
+                            classification: classification
+                        });
+                        break;
+                    case 'binary equality operation':
+                        var token1 = checkString(stack.pop(), stack);
+                        var token2 = checkString(stack.pop(), stack);
+                        
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'FAIL';
+                        if (token1.lexeme === token2.lexeme 
+                        && token1.classification === token2.classification)
+                            lexeme = 'WIN';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
+                        break;
+                    case 'binary inequality operation':
+                        var token1 = checkString(stack.pop(), stack);
+                        var token2 = checkString(stack.pop(), stack);
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'WIN';
+                        if (token1.lexeme === token2.lexeme 
+                        && token1.classification === token2.classification)
+                            lexeme = 'FAIL';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
+                        break;
+                    case 'AND operation':
+                        var token1 = castToBool(checkString(stack.pop(), stack));
+                        var token2 = castToBool(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'WIN';
+                        
+                        if (token1.lexeme !== token2.lexeme)
+                            lexeme = 'FAIL';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
+                        break;
+                    case 'OR operation':
+                        var token1 = castToBool(checkString(stack.pop(), stack));
+                        var token2 = castToBool(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'FAIL';
+                        
+                        if (token1.lexeme === 'WIN')
+                            lexeme = 'WIN';
+                        if (token2.lexeme === 'WIN')
+                            lexeme = 'WIN';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
+                        break;
+                    case 'XOR operation':
+                        var token1 = castToBool(checkString(stack.pop(), stack));
+                        var token2 = castToBool(checkString(stack.pop(), stack));
+                        if (!token1 || !token2) {
+                            return ERROR;
+                        }
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'FAIL';
+                        
+                        if (token1.lexeme === 'WIN' && token2.lexeme === 'FAIL')
+                            lexeme = 'WIN';
+                        if (token2.lexeme === 'WIN' && token1.lexeme === 'FAIL')
+                            lexeme = 'WIN';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
+                        break;
+                    case 'unary negation operation':
+                        var token1 = castToBool(checkString(stack.pop(), stack));
+                        if (!token1) {
+                            return ERROR;
+                        }
+                        var token2 = { classification: '' };
+                        castFromNil(token1, token2, terminal);
+                        var lexeme = 'FAIL';
+                        if (token1.lexeme === 'FAIL')
+                            lexeme = 'WIN';
+                        var classification = 'boolean literal';
+
+                        stack.push({
+                            lexeme: lexeme, 
+                            classification: classification
+                        });
                         break;
                     case 'variable identifier':
-                        for (symbol of symbols) {
+                        for (let symbol of symbols) {
                             if (symbol.identifier === tokens[i].lexeme) {
-                                stack.push({
-                                    lexeme: symbol.value,
-                                    classification: 'integer literal'
-                                });
+                                stack.push(getToken(symbol));
                                 break;
                             }
                         }
                         break;
                     default:
                         stack.push(tokens[i]);
+                        
                 }
             } 
-            var result = stack.pop().lexeme;
-            if (result === '"') {
-                result = result.concat(stack.pop().lexeme, stack.pop().lexeme);
-            }
-            return result;
+            return stack;
         }
 
-        function evaluateConditionalExpression(tokens, symbols) {
-            var stack = [];
-            for (let i=tokens.length-1; i>=0; i--) {
-                switch(tokens[i].classification) {
-                    case 'parameter delimiter':
-                        break;
-                    case 'binary equality operation':
-                        var num1 = +stack.pop().lexeme;
-                        var num2 = +stack.pop().lexeme;
-                        var result = (num1 = num2)? true : false;
-                        return result;
-                        break;
-                    case 'binary inequality operation':
-                        var num1 = +stack.pop().lexeme;
-                        var num2 = +stack.pop().lexeme;
-                        var result = (num1 != num2)? true : false;
-                        return result; 
-                        break;
-                    default:
-                        stack.push(tokens[i]);
+        function getToken(symbol) {
+            var lexeme = symbol.value , classification;
+            switch (symbol.type) {
+                case 'YARN':
+                    classification =  'string literal';
+                    break;
+                case 'NUMBR': 
+                    classification =  'integer literal';
+                    break;
+                case 'NUMBAR': 
+                    classification =  'floating-point literal';
+                    break;
+                case 'TROOF': 
+                    classification =  'boolean literal';
+                    break;
+            }
+            return {
+                lexeme: lexeme,
+                classification: classification
+            };
+
+        }
+
+        function changeType(symbol) {
+            var string = symbol.value.toString();
+            if (/\.\d+$/.test(string))
+                return 'NUMBAR';
+            else if (/^\d+$/.test(string))
+                return 'NUMBR';
+            else if (/^(WIN|FAIL)$/.test(string))
+                return 'TROOF';
+            else if (/^".*"$/)
+                return 'YARN';
+            else 
+                return 'NOOB';
+        }
+
+        function castToBool(token) {
+            var lexeme = 'WIN';
+            var classification = 'boolean literal';
+
+            if (token.classification !== 'boolean literal')
+                return false;
+            
+            if (token.lexeme === 'FAIL')
+                lexeme = 'FAIL';
+
+            return {
+                lexeme: lexeme,
+                classification: classification
+            };
+
+
+        }
+
+        function castToNumber(token) {
+            var lexeme = +token.lexeme;
+            var classification = 'integer literal';
+
+            if (token.classification === 'boolean literal' 
+            || token.classification === 'NOOB')
+                return false;
+            
+            if (token.classification === 'string literal') {
+                var splitted = token.lexeme.split('"');
+                if (!isNaN(splitted[1])) {
+                    lexeme = +splitted[1];
+                } else {
+                    return false;
                 }
-            } 
-            var result = stack.pop().lexeme;
-            if (result === '"') {
-                result = result.concat(stack.pop().lexeme, stack.pop().lexeme);
             }
-            return result;
+            
+            if (token.classification === 'floating-point literal')
+                classification = 'floating-point literal';
+
+            return {
+                lexeme: lexeme,
+                classification: classification
+            };
         }
 
-        function input(tokens) {
+        function checkString(token, stack) {
+            var lexeme = token.lexeme;
+            var classification = token.classification;
+            if (token.lexeme === '"') {
+                lexeme = lexeme + stack.pop().lexeme + stack.pop().lexeme;
+                classification = 'string literal';
+            }
+            return {
+                lexeme: lexeme,
+                classification: classification
+            };
+        }
 
+        function castFromNil(token1, token2, terminal) {
+            if (token1.classification === 'NOOB' || token2.classification === 'NOOB') {
+                terminal.push('Cannot implicitly cast nil');
+            }
         }
 
     }

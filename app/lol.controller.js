@@ -11,7 +11,11 @@
         vm.tokens = [];
         vm.symbols = [];
         vm.terminal = [];
-        vm.input = {flag:false, value:""};
+        vm.input = {
+            flag: false, 
+            value: '',
+            symbol: ''
+        };
 
         vm.execute = execute;
         vm.loadFile = loadFile;
@@ -32,9 +36,6 @@
             vm.input = {flag:false, value:""};
             lexer.analyze(vm.text, vm.tokens, vm.symbols);
             parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input);
-            console.log(vm.tokens);
-            console.log(vm.symbols);
-            console.log(vm.input.flag);
         }
 
         function loadFile() {
@@ -46,10 +47,9 @@
         }
 
         function submit() {
-            console.log(vm.input.value);
             vm.terminal.push(vm.input.value);
             vm.input.value = "";
-            vm.input.flag = false;
+            parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input);
         }
 
     }
