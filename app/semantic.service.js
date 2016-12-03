@@ -18,7 +18,9 @@
         function analyze(line, terminal, symbols, input) {
             
             if (!line.length) return;
-            else if(line[0].classification === 'code delimiter start' || line[0].classification === 'code delimiter end' || line[0].classification === 'line comment delimiter'){
+            else if(line[0].classification === 'code delimiter start' 
+                || line[0].classification === 'code delimiter end' 
+                || line[0].classification === 'line comment delimiter'){
                 return;
             }
             else if (endFlag!=null) {
@@ -111,6 +113,20 @@
                         }
 					}			
 				}
+                if(line.length === 1){
+                    for(let symbol of symbols){
+                        if(symbol.identifier === line[0].lexeme){
+                            for(let sm of symbols){
+                                if(sm.identifier === 'IT'){
+                                    sm.value = symbol.value ;
+                                    sm.type= symbol.type;
+                                    break;
+                                }
+                            }                            
+                        }
+
+                    }
+                }
 			}
 
             /*else if (line[0].classification ==== 'switch delimiter'){
@@ -480,8 +496,6 @@
                 lexeme: lexeme,
                 classification: classification
             };
-
-
         }
 
         function castToNumber(token) {
