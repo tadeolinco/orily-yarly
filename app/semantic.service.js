@@ -30,12 +30,14 @@
                     break;
                     }
                 }
-                return;
+                continue;
             }
 
             else if (startFlag!=null) {
                 if (line[0].classification === startFlag[0]) {
-                    startFlag = null;
+                    if (startFlag[1] == evaluate(line.slice(1),symbols, terminal)){
+                        startFlag = null;
+                    }
                 } else {
                     return;
                 }
