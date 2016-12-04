@@ -120,7 +120,6 @@
                         && line[0].classification === 'block comment delimiter'
                         && line[1].classification === 'block comment'
                         && line[2].classification === 'block comment delimiter') {
-                        console.log("EMPTY COMMENT RIGHT HURR BITCH")
                         line = [];
                         continue;
                     }
@@ -506,10 +505,8 @@
                 && expect('variable identifier', line)) {
                     if (expect('loop condition', line)) {
                         if (expression(line)){
-                            console.log("HYYYYYYUUUUUUUUUUUUUUUNNNNNGG");
                             return true;
                         }
-                        console.log("OPPPPAAAAAAAAAAAAAAAAAAAAA");
                         return false;
                     }
                 return true;
