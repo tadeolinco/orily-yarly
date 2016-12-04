@@ -559,10 +559,6 @@
                         token2.classification === 'floating-point literal') {
                             classification = 'floating-point literal';
                         }
-                        console.log({
-                            lexeme: lexeme,
-                            classification: classification
-                        });
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -579,7 +575,10 @@
                         var lexeme = (token1.lexeme > token2.lexeme)? token1.lexeme : token2.lexeme;
                         var classification = 'integer literal';
                         if (lexeme % 1 !== 0) classification = 'floating-point literal';
-
+                        console.log({
+                            lexeme: lexeme,
+                            classification: classification
+                        });
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -609,8 +608,6 @@
                         castFromNil(token1, terminal);
                         castFromNil(token2, terminal);
                         var lexeme = 'FAIL';
-                        console.log(token1)
-                        console.log(token2);
                         if (token1.lexeme == token2.lexeme 
                         && token1.classification === token2.classification) 
                             lexeme = 'WIN';

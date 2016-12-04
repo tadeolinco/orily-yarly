@@ -82,7 +82,7 @@
                     pairDelimiters--;
                 }
                 if (pairDelimiters < 0) {
-                    terminal.push("ERROR: Unexpected OIC")
+                    terminal.line.push("ERROR: Unexpected OIC")
                     return false;
                 }
             }
@@ -90,7 +90,7 @@
                 return true;
             }
             else {
-                terminal.push("ERROR: Expected delimiters");
+                terminal.line.push("ERROR: Expected delimiters");
                 return false;
             }
         }
@@ -116,12 +116,20 @@
                             line.pop();
                         }
                     }
+                    if (line.length >= 3
+                        && line[0].classification === 'block comment delimiter'
+                        && line[1].classification === 'block comment'
+                        && line[2].classification === 'block comment delimiter') {
+                        console.log("EMPTY COMMENT RIGHT HURR BITCH")
+                        line = [];
+                        continue;
+                    }
                     if (!statementLegality(line, scope, tokens)) {
                         var error = 'ERROR: "';
                         for (let token of line) {
                             error += token.lexeme + ' ';
                         }
-                        error += '" AT LINE: ' + row;
+                        error += '"'
                         terminal.line.push(error);
                         break;
                     }  
@@ -133,7 +141,7 @@
                         for (let token of line) {
                             error += token.lexeme + ' ';
                         }
-                        error += '" AT LINE: ' + row;
+                        error += '"'
                         terminal.line.push(error);
                         break;
                     };
