@@ -116,7 +116,6 @@
                     row++;
                     console.log(row + ': LINE DONE!');
                     if (!checkScope(line, scope)) {
-                        console.log('asdasdasd');
                         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
                         break;
                     };
@@ -463,15 +462,29 @@
 
             /* LOOP */
             column = 0;
-            if (expect('loop condition', line)
+            if (expect('loop delimiter start', line)
                 && expect('loop identifier', line)
-                && expect('function argument delimiter',line)) {
+                && (expect('increment operator', line) || expect('decrement operator',line))
+                && expect('function argument delimiter',line)
+                && expect('variable identifier', line)) {
                     if (expect('loop condition', line)) {
                         if (expression(line)){
+                            console.log("HYYYYYYUUUUUUUUUUUUUUUNNNNNGG");
                             return true;
                         }
+                        console.log("OPPPPAAAAAAAAAAAAAAAAAAAAA");
                         return false;
                     }
+                return true;
+            }
+
+            if (expect('break delimiter', line)){
+                return true;
+            }
+
+            column = 0;
+            if (expect('loop delimiter end', line) 
+                && expect('loop identifier', line)) {
                 return true;
             }
             

@@ -12,6 +12,10 @@
         var endIfElse = null;
         var startSwitch = null;
         var endSwitch = null;
+        var loopFlag = false;
+        var loopOperation = [];
+        var loopCondition = [];
+        var loopArray = [];
 
         return service = {
             analyze: analyze,
@@ -24,6 +28,10 @@
             endIfElse = null;
             startSwitch = null;
             endSwitch = null;
+            loopFlag = false;
+            loopCondition = [];
+            loopOperation = [];
+            loopArray = [];
         }
 
         function analyze(line, terminal, symbols, input) {
@@ -34,6 +42,42 @@
                 || line[0].classification === 'code delimiter end' 
                 || line[0].classification === 'line comment delimiter'){
                 return;
+            }
+
+            /* ON-GOING LOOP */
+            else if (loopFlag) {
+                if (line[0].classification !== 'loop delimiter end'){
+                    loopArray.push(line);
+                    return;
+                }
+                loopFlag = false;
+                console.log('conditional');
+                console.log(loopCondition);
+
+                //while (analyze(loopCondition, terminal, symbols, input)) {
+                    console.log(analyze(loopCondition, terminal, symbols, input));
+                   // for (let arrayline of loopArray) {
+                        // if (arrayline[0].classification === 'break delimiter') {
+                        //     break;
+                        // }
+                        // analyze(arrayline, terminal, symbols, input);
+                    //}
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                    analyze(loopOperation, terminal, symbols, input);
+                //}
+                loopCondition = [];
+                loopOperation = [];
+                loopArray = [];
             }
 
             else if (startIfElse != null) {
@@ -67,7 +111,6 @@
                 }
                 return;
             }
-
             
             else if (line[0].classification === 'declaration delimiter') {
                 if (line.length > 3) { // initialization 
@@ -170,13 +213,21 @@
                 endSwitch = ['conditional delimiter end', 'break delimiter'];                
             }
 
-            else if (line[0].classification === 'conditional delimiter'){
+            else if (line[0].classification === 'conditional delimiter') {
                 if (symbols[0].value == 'WIN') {
                     startIfElse = ['conditional if delimiter'];
                 } else {
                     startIfElse = ['conditional else delimiter'];
                 }
                 endIfElse = ['conditional delimiter end', 'break delimiter'];                
+            }
+
+            /* Triggers Loop */
+            else if (line[0].classification === 'loop delimiter start') {
+                loopFlag = true;
+                loopOperation = [line[2],line[4]];
+                loopCondition = line.slice(5);
+                return;
             }
 
             else if (endIfElse != null) {
@@ -189,6 +240,44 @@
                     }
                 }
             }
+
+            /* Returns state of loop condition */
+            else if (line[0].classification === 'loop condition') {
+                var loopContinue = evaluate(line.slice(1), symbols, terminal)[0];
+                console.log(loopContinue);
+                if (loopContinue.lexeme == 'WIN' && line[0].lexeme === 'WILE'){
+                    console.log("OMG WILE SIYA");
+                    return true;
+                }
+                if (loopContinue.lexeme == 'FAIL' && line[0].lexeme === 'TIL'){
+                    console.log("OMG TIL SIYA");
+                    return true;
+                }
+                return false;
+            }
+
+            else if (line[0].classification === 'increment operator') {
+                for (let symbol of symbols) {
+                    if (line[1].lexeme === symbol.identifier) {
+                        if (symbol.type !== 'NUMBR') {
+                            return ERROR;
+                        }
+                        symbol.value++;
+                    }
+                }
+            }
+
+            else if (line[0].classification === 'increment operator') {
+                for (let symbol of symbols) {
+                    if (line[1].lexeme === symbol.identifier) {
+                        if (symbol.type !== 'NUMBR') {
+                            return ERROR;
+                        }
+                        symbol.value--;
+                    }
+                }
+            }
+
             else{
                 var result = evaluate(line,symbols,terminal);
                     if (result != ERROR) {
