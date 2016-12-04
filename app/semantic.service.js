@@ -186,6 +186,20 @@
                             string = token.lexeme + string;
                         }
                     }
+                    var beepCount = string.split(':o').length-1;
+                    if (beepCount) {
+                        new Audio('beep.mp3').play();
+                        beepCount--;
+                        if (beepCount) {
+                            var beeper = setInterval(function() {    
+                                beepCount--;
+                                if (!beepCount)
+                                    clearInterval(beeper);
+                                new Audio('beep.mp3').play();
+                            }, 1000);
+                        }
+                    }
+                    
                     string = string.replace(/:\)/g, '\n');
                     string = string.replace(/:>/g, '\t');
                     string = string.replace(/:o/g, '');
