@@ -54,15 +54,9 @@
                     if (result.length === 3) {
                         actualValue += result[1].lexeme + result[2].lexeme;
                     }
-<<<<<<< HEAD
-                    // Compares startFlag literal to true literal
-                    if (startFlag[1] == actualValue){
-                        startFlag = null;
-=======
                     // Compares startIfElse literal to true literal
-                    if (startIfElse[1] === actualValue){
+                    if (startIfElse[1] == actualValue){
                         startIfElse = null;
->>>>>>> 73701d180de1ce2932f582ef1d5b3635c3685182
                         return;
                     }
                 } 
@@ -127,24 +121,26 @@
                             string = token.lexeme + string;
                         }
                     }
-                    if (!terminal.newline) {
-                        terminal.newline = true;
-                    }
                     string = string.replace(/:\)/g, '\n');
                     string = string.replace(/:>/g, '\t');
                     string = string.replace(/:o/g, '');
                     string = string.replace(/:"/g, '\"');
                     string = string.replace(/::/g, ':');
-                    terminal.line.push(string);
-                    // if (printNewline) {
-                    //     terminal.line.push(string);
-                    // } else { 
-                    //     if (!terminal.line.length)
-                    //         terminal.line.push(string)
-                    //     else
-                    //         terminal.line[terminal.line.length-1] += string;
-                    //     printNewline = true;
+                    
+                    // if (!terminal.newline) {
+                    //     terminal.newline = true;
                     // }
+                    
+                    //terminal.line.push(string);
+                    if (terminal.newline) {
+                        terminal.line.push(string);
+                    } else { 
+                        if (!terminal.line.length)
+                            terminal.line.push(string)
+                        else
+                            terminal.line[terminal.line.length-1] += string;
+                        terminal.newline = true;
+                    }
 
                     if (line[line.length-1].classification === 'newline supress') {
                         terminal.newline = false;
@@ -158,7 +154,6 @@
 
 			else if (line[0].classification === 'variable identifier'){
 				// <var> R <expression>
-<<<<<<< HEAD
 				if(line.length > 2){
                     if (line[1].classification === 'assignment operator') {
                         for(let symbol of symbols){
@@ -173,18 +168,6 @@
                                     }
                                 } else {
                                     return ERROR;
-=======
-				if (line.length > 2) {
-					for (let symbol of symbols) {
-						if (symbol.identifier === line[0].lexeme) {
-                            var result = evaluate(line.slice(2), symbols, terminal);
-                            if (result !== ERROR) {
-                                symbol.value = result[0].lexeme;
-                                symbol.type = changeType(result[0].classification);
-                                if (result.length === 3) {
-                                    symbol.value += result[1].lexeme + result[2].lexeme;
-                                    symbol.type = changeType(result[1].classification);
->>>>>>> 73701d180de1ce2932f582ef1d5b3635c3685182
                                 }
                                 break;
                             }
@@ -286,7 +269,6 @@
                         }
                     }
 				}
-<<<<<<< HEAD
                 if(line.length === 1){
                     var found = false;
                     for(let symbol of symbols){
@@ -294,13 +276,6 @@
                             symbols[0].value = symbol.value ;
                             symbols[0].type = symbol.type;
                             found = true;
-=======
-                if (line.length === 1) {
-                    for(let symbol of symbols){
-                        if(symbol.identifier === line[0].lexeme){
-                            symbols[0].value = symbol.value ;
-                            symbols[0].type= symbol.type;
->>>>>>> 73701d180de1ce2932f582ef1d5b3635c3685182
                             break;                          
                         }
                     }
