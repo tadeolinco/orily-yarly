@@ -46,29 +46,64 @@
 
             /* ON-GOING LOOP */
             else if (loopFlag) {
+                // Creates block of code until loop delimiter end reached
                 if (line[0].classification !== 'loop delimiter end'){
                     loopArray.push(line);
                     return;
                 }
-                loopFlag = false;
-                console.log('conditional');
-                console.log(loopCondition);
 
+                // Turns of loopFlag, allows user to 
+                loopFlag = false;
                 while (analyze(loopCondition, terminal, symbols, input)) {
-                    console.log(analyze(loopCondition, terminal, symbols, input));
+                   // Performs whole array
                    for (let arrayline of loopArray) {
+                        // Catches if GTFO
                         if (arrayline[0].classification === 'break delimiter') {
                             break;
                         }
                         analyze(arrayline, terminal, symbols, input);
                     }
+                    // Nerfin/Uppin
                     analyze(loopOperation, terminal, symbols, input);
                 }
+                // Resets variables for loop
                 loopCondition = [];
                 loopOperation = [];
                 loopArray = [];
             }
 
+            /* ON-GOING IF-ELSE CASE */
+            else if (startIfElse != null ) {
+                // Checks where to start code
+                for (let start of startIfElse) {
+                    if (line[0].classification === start) {
+                        //Finds 'MEBBE'
+                        if (line[0].classification === 'conditional else if delimiter') {
+                            var result = evaluate(line.slice(1), symbols, terminal);
+                            console.log("LOOK AT ME NOW");
+                            console.log(result);
+                            if (result !== ERROR) {
+                                console.log("DI ME NAGERROR");
+                                console.log(result.lexeme);
+                                if(result[0].lexeme === "WIN") {
+                                    console.log("PAPASOK AKO DITO BITCHES");
+                                    startIfElse = null;
+                                    endIfElse = ['conditional else delimiter', 'conditional else if delimiter','conditional delimiter end'];
+                                    break;
+                                } 
+                            }
+                            continue;
+                        }
+                        // Finds 'OIC', 'NO WAI' or 'YA RLY'
+                            startIfElse = null;
+                            break;
+                        }
+                    }
+                return;
+            }
+
+
+            /* ON-GOING SWITCH CASE */
             else if (startSwitch != null) {
 
                 // Checks if classification is as indicated in startSwitch
@@ -92,7 +127,8 @@
                         startSwitch = null;
                         return;
                     }
-                } 
+                }
+                // Case if default case reached and does not enter code block 
                 else if (line[0].classification === 'default case delimiter' 
                     && startSwitch[0] !== 'conditional delimiter end') {                    
                     startSwitch = null;
@@ -317,18 +353,22 @@
                 }
 			}
 
+            // Initialises Switch Case
             else if (line[0].classification === 'switch delimiter'){
                 startSwitch = ['case delimiter', symbols[0].value];
                 endSwitch = ['conditional delimiter end', 'break delimiter'];                
             }
 
+            // Initialises If-Else Statement
             else if (line[0].classification === 'conditional delimiter') {
                 if (symbols[0].value == 'WIN') {
+                    // Looks for 'YA RLY'
                     startIfElse = ['conditional if delimiter'];
+                    endIfElse = ['conditional else if delimiter', 'conditional else delimiter', 'conditional delimiter end', 'break delimiter']
                 } else {
-                    startIfElse = ['conditional else delimiter'];
+                    // Looks for 'MEBBE' or 'NO WAI'
+                    startIfElse = ['conditional else if delimiter','conditional else delimiter', 'conditional delimiter end', 'break delimiter'];                
                 }
-                endIfElse = ['conditional delimiter end', 'break delimiter'];                
             }
 
             /* Triggers Loop */
@@ -346,6 +386,17 @@
                             startSwitch = ['conditional delimiter end'];
                         }
                             endSwitch = null;
+                    }
+                }
+            }
+
+            else if (endIfElse != null) {
+                for (let end of endIfElse) {
+                    if (end === line[0].classification) {
+                        if (end != 'conditional delimiter end') {
+                            startSwitch = ['conditional delimiter end'];
+                        }
+                            endIfElse = null;
                     }
                 }
             }
@@ -385,6 +436,10 @@
                         symbol.value--;
                     }
                 }
+            }
+
+            else if (line[0].classification === 'conditional delimiter end') {
+                return;
             }
 
             else{
