@@ -8,10 +8,10 @@
     function semantic() {
         const ERROR = 'ERROR PARSING STRING';
         var printNewline = true;
-        var startFlag = null;
-        var endFlag = null;
-        var startingFlag = null;
-        var endingFlag = null;
+        var startIfElse = null;
+        var endIfElse = null;
+        var startSwitch = null;
+        var endSwitch = null;
 
         return service = {
             analyze: analyze,
@@ -20,8 +20,10 @@
         };
 
         function restart(){
-            startFlag = null;
-            endFlag = null;
+            startIfElse = null;
+            endIfElse = null;
+            startSwitch = null;
+            endSwitch = null;
         }
 
         function analyze(line, terminal, symbols, input) {
@@ -34,15 +36,14 @@
                 return;
             }
 
-            else if (startFlag != null) {
+            else if (startIfElse != null) {
 
-                // Checks if classification is as indicated in startFlag
-
-                if (line[0].classification === startFlag[0]) {
+                // Checks if classification is as indicated in startIfElse
+                if (line[0].classification === startIfElse[0]) {
                     
                     // In case of 'OIC'
                     if (line.length == 1) {
-                       startFlag = null;
+                       startIfElse = null;
                        return;
                     } 
 
@@ -53,15 +54,15 @@
                     if (result.length === 3) {
                         actualValue += result[1].lexeme + result[2].lexeme;
                     }
-                    // Compares startFlag literal to true literal
-                    if (startFlag[1] === actualValue){
-                        startFlag = null;
+                    // Compares startIfElse literal to true literal
+                    if (startIfElse[1] === actualValue){
+                        startIfElse = null;
                         return;
                     }
                 } 
                 else if (line[0].classification === 'default case delimiter' 
-                    && startFlag[0] !== 'conditional delimiter end') {                    
-                    startFlag = null;
+                    && startIfElse[0] !== 'conditional delimiter end') {                    
+                    startIfElse = null;
                     return;
                 }
                 return;
@@ -135,8 +136,8 @@
 
 			else if (line[0].classification === 'variable identifier'){
 				// <var> R <expression>
-				if(line.length > 2){
-					for(let symbol of symbols){
+				if (line.length > 2) {
+					for (let symbol of symbols) {
 						if (symbol.identifier === line[0].lexeme) {
                             var result = evaluate(line.slice(2), symbols, terminal);
                             if (result !== ERROR) {
@@ -153,30 +154,38 @@
                         }
 					}			
 				}
-                if(line.length === 1){
+                if (line.length === 1) {
                     for(let symbol of symbols){
                         if(symbol.identifier === line[0].lexeme){
-                           
-                                    symbols[0].value = symbol.value ;
-                                    symbols[0].type= symbol.type;
-                                    break;                          
+                            symbols[0].value = symbol.value ;
+                            symbols[0].type= symbol.type;
+                            break;                          
                         }
                     }
                 }
 			}
 
             else if (line[0].classification === 'switch delimiter'){
-                startFlag = ['case delimiter', symbols[0].value];
-                endFlag = ['conditional delimiter end', 'break delimiter'];                
+                startSwitch = ['case delimiter', symbols[0].value];
+                endSwitch = ['conditional delimiter end', 'break delimiter'];                
             }
 
-            else if (endFlag != null) {
-                for (let end of endFlag) {
+            else if (line[0].classification === 'conditional delimiter'){
+                if (symbols[0].value == 'WIN') {
+                    startIfElse = ['conditional if delimiter'];
+                } else {
+                    startIfElse = ['conditional else delimiter'];
+                }
+                endIfElse = ['conditional delimiter end', 'break delimiter'];                
+            }
+
+            else if (endIfElse != null) {
+                for (let end of endIfElse) {
                     if (end === line[0].classification) {
                         if (end != 'conditional delimiter end') {
-                            startFlag = ['conditional delimiter end'];
+                            startIfElse = ['conditional delimiter end'];
                         }
-                            endFlag = null;
+                            endIfElse = null;
                     }
                 }
             }
