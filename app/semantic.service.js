@@ -192,11 +192,6 @@
                     string = string.replace(/:"/g, '\"');
                     string = string.replace(/::/g, ':');
                     
-                    // if (!terminal.newline) {
-                    //     terminal.newline = true;
-                    // }
-                    
-                    //terminal.line.push(string);
                     if (terminal.newline) {
                         terminal.line.push(string);
                     } else { 
