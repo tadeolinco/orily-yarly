@@ -16,6 +16,7 @@
 
         function analyze(tokens, symbols, terminal, input, scope) {
             if (!input.flag) {
+                if(!checkPairs(tokens, terminal)) return;
                 column = 0;
                 row = 0;
                 totalTokens = 0;
@@ -69,6 +70,30 @@
             }
            
         }
+
+        function checkPairs(tokens, terminal) {
+            var pairDelimiters = 0;
+            for (let token of tokens) {
+                if (token.classification === 'conditional delimiter'
+                    || token.classification === 'switch delimiter') {
+                    pairDelimiters++;
+                }
+                if (token.classification === 'conditional delimiter end') {
+                    pairDelimiters--;
+                }
+                if (pairDelimiters < 0) {
+                    terminal.push("ERROR: Unexpected OIC")
+                    return false;
+                }
+            }
+            if (pairDelimiters == 0) {
+                return true;
+            }
+            else {
+                terminal.push("ERROR: Expected delimiters");
+                return false;
+            }
+        }
         
         function parseLine(start, tokens, terminal, symbols, input, scope){
             var line = [];
@@ -91,7 +116,7 @@
                             line.pop();
                         }
                     }
-                    if (!statementLegality(line, scope)) {
+                    if (!statementLegality(line, scope, tokens)) {
                         var error = 'ERROR: "';
                         for (let token of line) {
                             error += token.lexeme + ' ';
@@ -320,7 +345,7 @@
         }
 
         /* Iterates throughout statement array and checks legality */
-        function statementLegality(line, scope) {
+        function statementLegality(line, scope, tokens) {
             /* HAI */
             if (!line.length) return true;
 
@@ -462,6 +487,21 @@
             if (expect('break delimiter', line)){
                 return true;
             }
+
+            /* LOOP */
+            column = 0;
+            if (expect('loop condition', line)
+                && expect('loop identifier', line)
+                && expect('function argument delimiter',line)) {
+                    if (expect('loop condition', line)) {
+                        if (expression(line)){
+                            return true;
+                        }
+                        return false;
+                    }
+                return true;
+            }
+            
 
             /* Line does not meet anything */
             return false;
