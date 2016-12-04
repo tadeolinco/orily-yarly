@@ -183,9 +183,6 @@
                         if (exec = (/"(.*)"/.exec(token.lexeme)))
                             string = exec[1] + string;
                         else if (token.lexeme !== '"') {
-                            if (token.classification === 'floating-point literal') {
-                                token.lexeme = (+token.lexeme).toFixed(2);
-                            }
                             string = token.lexeme + string;
                         }
                     }
@@ -475,11 +472,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = token1.lexeme + token2.lexeme;
                         var classification = 'integer literal';
-                        if (token1.classification === 'floating-point literal' ||
-                        token2.classification === 'floating-point literal') {
+                        if (parseInt(lexeme) !== lexeme)
                             classification = 'floating-point literal';
-                        }
-
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -495,10 +489,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = token1.lexeme - token2.lexeme;
                         var classification = 'integer literal';
-                        if (token1.classification === 'floating-point literal' ||
-                        token2.classification === 'floating-point literal') {
+                        if (parseInt(lexeme) !== lexeme)
                             classification = 'floating-point literal';
-                        }
 
                         stack.push({
                             lexeme: lexeme,
@@ -515,10 +507,11 @@
                         castFromNil(token2, terminal);
                         var lexeme = token1.lexeme * token2.lexeme;
                         var classification = 'integer literal';
-                        if (token1.classification === 'floating-point literal' ||
-                        token2.classification === 'floating-point literal') {
+                            console.log('FLOATING POINT DAW OHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+                            console.log(token1);
+                            console.log(token2);
+                        if (parseInt(lexeme) !== lexeme)
                             classification = 'floating-point literal';
-                        }
 
                         stack.push({
                             lexeme: lexeme,
@@ -535,10 +528,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = token1.lexeme / token2.lexeme;
                         var classification = 'integer literal';
-                        if (token1.classification === 'floating-point literal' ||
-                        token2.classification === 'floating-point literal') {
+                        if (parseInt(lexeme) !== lexeme)
                             classification = 'floating-point literal';
-                        }
 
                         stack.push({
                             lexeme: lexeme,
@@ -555,10 +546,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = token1.lexeme % token2.lexeme;
                         var classification = 'integer literal';
-                        if (token1.classification === 'floating-point literal' ||
-                        token2.classification === 'floating-point literal') {
+                        if (parseInt(lexeme) !== lexeme)
                             classification = 'floating-point literal';
-                        }
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -574,7 +563,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = (token1.lexeme > token2.lexeme)? token1.lexeme : token2.lexeme;
                         var classification = 'integer literal';
-                        if (lexeme % 1 !== 0) classification = 'floating-point literal';
+                        if (parseInt(lexeme) !== lexeme)
+                            classification = 'floating-point literal';
                         console.log({
                             lexeme: lexeme,
                             classification: classification
@@ -594,7 +584,8 @@
                         castFromNil(token2, terminal);
                         var lexeme = (token1.lexeme < token2.lexeme)? token1.lexeme : token2.lexeme;
                         var classification = 'integer literal';
-                        if (lexeme % 1 !== 0) classification = 'floating-point literal';
+                        if (parseInt(lexeme) !== lexeme)
+                            classification = 'floating-point literal';
 
                         stack.push({
                             lexeme: lexeme,
@@ -977,8 +968,8 @@
                     return false;
                 }
             }
-            
-            if (token.classification === 'floating-point literal')
+
+            if (parseInt(lexeme) !== lexeme)
                 classification = 'floating-point literal';
 
             return {
