@@ -126,7 +126,7 @@
                     checkTrash(exec);
                     switch (exec[1]) {
                         case "MAEK"     : pushToken(exec[1], 'immediate casting operation');               break;
-                        case "IS NOW A" : pushToken(exec[1], 'casting assigment delimiter');    break;
+                        case "IS NOW A" : pushToken(exec[1], 'casting assignment delimiter');    break;
                     }
                     i--;
                     continue;

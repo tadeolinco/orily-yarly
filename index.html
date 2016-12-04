@@ -16,9 +16,9 @@
                     <button ng-click="lol.openFile();" class="ui button">Open File</button>
                     </center>
                     <input type="file" id="file" style="display: none;" ng-model="lol.file" ng-change="lol.loadFile()">
-                    <div class="ui padded segment form">
+                    <div class="ui form" style="margin-top: 1rem;">
                         <div class="field">
-                            <textarea ng-model="lol.text" id="textbox" rows="14"></textarea>
+                            <textarea ng-model="lol.text" id="textbox" rows="16"></textarea>
                         </div>
                     </div>
                 </div>
@@ -74,15 +74,13 @@
 
         <div class ="row">
             <div class = "twelve wide column">
-                <h3 class="ui top attached segment">Console</h3>
+                <h3 class="ui top attached segment">Console{{}}</h3>
                 <div class = "ui segment" style="overflow-y:auto;white-space:nowrap;height:25vh;background:black">
                     <ol style="list-style-type: none; margin: 0; padding: 0;color:white">
-                        <li ng-repeat="variable in lol.terminal track by $index">
-                            >> {{lol.terminal[$index]}}
-                        </li>
+                        <li ng-repeat="variable in lol.terminal.line track by $index">{{lol.terminal.line[$index]}}</li>
                         <form ng-show="lol.input.flag" ng-submit="lol.submit()">
                             <div class="ui fluid icon input" style="color:white">
-                            >> <input type = "text" id="userInput" ng-model="lol.input.value" style="padding: 0;color:white" autofocus>
+                            <input type = "text" id="userInput" ng-model="lol.input.value" style="padding: 0;color:white" autocomplete="off">
                             </div>
                         </form>
                     </ol>

@@ -25,7 +25,7 @@
                 input.flag = false;
                 for (let symbol of symbols) {
                     if (symbol.identifier === input.symbol) {
-                        symbol.value = '"'+terminal[terminal.length-1]+'"';
+                        symbol.value = '"'+terminal.line[terminal.line.length-1]+'"';
                         symbol.type = 'YARN';
                         break;
                     }
@@ -72,6 +72,13 @@
         
         function parseLine(start, tokens, terminal, symbols, input, scope){
             var line = [];
+            if (start === 0) {
+                if (tokens[0].classification !== 'code delimiter start')
+                    return terminal.line.push('ERROR: EXPECTED "HAI" AT FIRST LINE');
+                if (tokens[tokens.length-1].classification !== 'code delimiter end') {
+                    return terminal.line.push('ERROR: EXPECTED "KTHXBYE" AT LAST LINE');
+                }
+            }
             for (let i=start; i<tokens.length; i++){
                 totalTokens++;
                 if (tokens[i].classification != 'statement delimiter') {
@@ -85,19 +92,29 @@
                         }
                     }
                     if (!statementLegality(line, scope)) {
-                        terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+                        var error = 'ERROR: "';
+                        for (let token of line) {
+                            error += token.lexeme + ' ';
+                        }
+                        error += '" AT LINE: ' + row;
+                        terminal.line.push(error);
                         break;
                     }  
                     row++;
                     console.log(row + ': LINE DONE!');
                     if (!checkScope(line, scope)) {
-                        console.log('asdasdasd');
-                        terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+                        var error = 'ERROR: "';
+                        for (let token of line) {
+                            error += token.lexeme + ' ';
+                        }
+                        error += '" AT LINE: ' + row;
+                        terminal.line.push(error);
                         break;
                     };
+                    console.log(line);
                     var result = semantic.analyze(line, terminal, symbols, input);
                     if (result === ERROR) {
-                        terminal.push(ERROR);
+                        terminal.line.push(ERROR);
                         break;
                     }
                     if (line.length && line[0].classification == 'input delimiter') {
@@ -109,16 +126,16 @@
             }
             // if (line.length) {
             //     if (!statementLegality(line, scope)) {
-            //         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+            //         terminal.line.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
             //     }  
             //     row++;
             //     console.log(row + ': LINE DONE!');
             //     if (!checkScope(line, scope)) {
-            //         terminal.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
+            //         terminal.line.push('UNEXPECTED TOKEN: "'+line[line.length-1].lexeme + '" AT LINE: ' + row);
             //     };
             // }
             // if (scope.length) {
-            //     terminal.push('ERROR: NOT PROPERLY TERMINATED');
+            //     terminal.line.push('ERROR: NOT PROPERLY TERMINATED');
             // }
         }
 
@@ -327,6 +344,16 @@
                         return true;
                     return false;
             }
+            column = 0;
+            if (expect('variable identifier', line)
+                && expect('casting assignment delimiter', line)) { 
+                    if (dataType(line)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+            }
+
             /* VISIBLE */
             column = 0;
             if (expect('output delimiter',line) 
