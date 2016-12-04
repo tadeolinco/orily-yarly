@@ -54,27 +54,16 @@
                 console.log('conditional');
                 console.log(loopCondition);
 
-                //while (analyze(loopCondition, terminal, symbols, input)) {
-                    console.log(analyze(loopCondition, terminal, symbols, input));
-                   // for (let arrayline of loopArray) {
-                        // if (arrayline[0].classification === 'break delimiter') {
-                        //     break;
-                        // }
-                        // analyze(arrayline, terminal, symbols, input);
-                    //}
+                while (analyze(loopCondition, terminal, symbols, input)) {
                     console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                //}
+                    for (let arrayline of loopArray) {
+                        if (arrayline[0].classification === 'break delimiter') {
+                            break;
+                        }
+                        analyze(arrayline, terminal, symbols, input);
+                    }
+                    analyze(loopOperation, terminal, symbols, input); // INCREMENT
+                }
                 loopCondition = [];
                 loopOperation = [];
                 loopArray = [];
@@ -387,7 +376,7 @@
                 }
             }
 
-            else if (line[0].classification === 'increment operator') {
+            else if (line[0].classification === 'decrement operator') {
                 for (let symbol of symbols) {
                     if (line[1].lexeme === symbol.identifier) {
                         if (symbol.type !== 'NUMBR') {
@@ -515,10 +504,6 @@
                         token2.classification === 'floating-point literal') {
                             classification = 'floating-point literal';
                         }
-                        console.log({
-                            lexeme: lexeme,
-                            classification: classification
-                        });
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -535,7 +520,10 @@
                         var lexeme = (token1.lexeme > token2.lexeme)? token1.lexeme : token2.lexeme;
                         var classification = 'integer literal';
                         if (lexeme % 1 !== 0) classification = 'floating-point literal';
-
+                        console.log({
+                            lexeme: lexeme,
+                            classification: classification
+                        });
                         stack.push({
                             lexeme: lexeme,
                             classification: classification
@@ -565,8 +553,6 @@
                         castFromNil(token1, terminal);
                         castFromNil(token2, terminal);
                         var lexeme = 'FAIL';
-                        console.log(token1)
-                        console.log(token2);
                         if (token1.lexeme == token2.lexeme 
                         && token1.classification === token2.classification) 
                             lexeme = 'WIN';
