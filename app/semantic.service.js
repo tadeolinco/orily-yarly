@@ -54,40 +54,29 @@
                 console.log('conditional');
                 console.log(loopCondition);
 
-                //while (analyze(loopCondition, terminal, symbols, input)) {
+                while (analyze(loopCondition, terminal, symbols, input)) {
                     console.log(analyze(loopCondition, terminal, symbols, input));
-                   // for (let arrayline of loopArray) {
-                        // if (arrayline[0].classification === 'break delimiter') {
-                        //     break;
-                        // }
-                        // analyze(arrayline, terminal, symbols, input);
-                    //}
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
+                   for (let arrayline of loopArray) {
+                        if (arrayline[0].classification === 'break delimiter') {
+                            break;
+                        }
+                        analyze(arrayline, terminal, symbols, input);
+                    }
                     analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                    console.log(evaluate(loopCondition.slice(1),symbols,terminal)[0].lexeme);
-                    analyze(loopOperation, terminal, symbols, input);
-                //}
+                }
                 loopCondition = [];
                 loopOperation = [];
                 loopArray = [];
             }
 
-            else if (startIfElse != null) {
+            else if (startSwitch != null) {
 
-                // Checks if classification is as indicated in startIfElse
-                if (line[0].classification === startIfElse[0]) {
+                // Checks if classification is as indicated in startSwitch
+                if (line[0].classification === startSwitch[0]) {
                     
                     // In case of 'OIC'
                     if (line.length == 1) {
-                       startIfElse = null;
+                       startSwitch = null;
                        return;
                     } 
 
@@ -98,15 +87,15 @@
                     if (result.length === 3) {
                         actualValue += result[1].lexeme + result[2].lexeme;
                     }
-                    // Compares startIfElse literal to true literal
-                    if (startIfElse[1] == actualValue){
-                        startIfElse = null;
+                    // Compares startSwitch literal to true literal
+                    if (startSwitch[1] == actualValue){
+                        startSwitch = null;
                         return;
                     }
                 } 
                 else if (line[0].classification === 'default case delimiter' 
-                    && startIfElse[0] !== 'conditional delimiter end') {                    
-                    startIfElse = null;
+                    && startSwitch[0] !== 'conditional delimiter end') {                    
+                    startSwitch = null;
                     return;
                 }
                 return;
@@ -350,13 +339,13 @@
                 return;
             }
 
-            else if (endIfElse != null) {
-                for (let end of endIfElse) {
+            else if (endSwitch != null) {
+                for (let end of endSwitch) {
                     if (end === line[0].classification) {
                         if (end != 'conditional delimiter end') {
-                            startIfElse = ['conditional delimiter end'];
+                            startSwitch = ['conditional delimiter end'];
                         }
-                            endIfElse = null;
+                            endSwitch = null;
                     }
                 }
             }
@@ -387,7 +376,7 @@
                 }
             }
 
-            else if (line[0].classification === 'increment operator') {
+            else if (line[0].classification === 'decrement operator') {
                 for (let symbol of symbols) {
                     if (line[1].lexeme === symbol.identifier) {
                         if (symbol.type !== 'NUMBR') {
