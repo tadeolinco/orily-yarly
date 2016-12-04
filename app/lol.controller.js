@@ -10,7 +10,10 @@
         vm.text = "";
         vm.tokens = [];
         vm.symbols = [];
-        vm.terminal = [];
+        vm.terminal = {
+            newline: true,
+            line: []
+        };
         vm.scope = [];
         vm.input = {
             flag: false, 
@@ -33,7 +36,10 @@
         function execute() {
             vm.tokens = [];
             vm.symbols = [];
-            vm.terminal = [];
+            vm.terminal = {
+                newline: true,
+                line: []
+            };
             vm.scope = [];
             vm.input = {flag:false, value:""};
             vm.multiLine =[];
@@ -51,7 +57,7 @@
         }
 
         function submit() {
-            vm.terminal.push(vm.input.value);
+            vm.terminal.line.push(vm.input.value);
             vm.input.value = "";
             parser.analyze(vm.tokens, vm.symbols, vm.terminal, vm.input, vm.scope);
         }
